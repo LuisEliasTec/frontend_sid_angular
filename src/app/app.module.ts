@@ -7,6 +7,9 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { ContentComponent } from './content/content.component';
 import { FooterComponent } from './footer/footer.component';
+import { PageModule } from './pages/pages.component.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+// import { PagesComponent } from './pages/pages.component';
 
 @NgModule({
   declarations: [
@@ -14,11 +17,14 @@ import { FooterComponent } from './footer/footer.component';
     NavbarComponent,
     SidebarComponent,
     ContentComponent,
-    FooterComponent
+    FooterComponent,
+    // PagesComponent,
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    PageModule,
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
