@@ -1,0 +1,14 @@
+<h3>{{data.message}} <span [ngSwitch]="data.type">
+
+    <span *ngSwitchCase="'success'">
+      <mat-icon aria-hidden="true">check_circle_outline</mat-icon>
+    </span>
+    <span *ngSwitchCase="'error'">
+      error!
+    </span>
+    <span *ngSwitchDefault>
+      default
+    </span>
+
+  </span>
+</h3>

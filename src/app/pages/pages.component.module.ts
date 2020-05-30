@@ -3,23 +3,37 @@ import { NgModule } from '@angular/core';
 import { PAGES_ROUTES } from './pages.routes';
 import { PagesComponent } from './pages.component';
 import { DashboardModule } from './dashboard/dashboard.component.module';
-// import { DashboardComponent } from './dashboard/dashboard.component';
-
+import * as Service from '../services/services.index';
+import { ProceduresModule } from './procedures/procedures.component.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { SharedModule } from '../shared/shared.module';
 
 @NgModule({
   declarations: [
-    PagesComponent,
-    // DashboardComponent
+    PagesComponent
   ],
-  entryComponents: [
-    // DashboardComponent
-  ],
+  entryComponents: [],
   imports: [
     BrowserModule,
     PAGES_ROUTES,
-    DashboardModule
+    DashboardModule,
+    ProceduresModule,
+    BrowserAnimationsModule,
+    HttpClientModule,
+    CommonModule,
+    MatSnackBarModule,
+    SharedModule
   ],
-  providers: [],
+  providers: [
+    Service.ApiService,
+    Service.CrudService,
+    Service.SessionService,
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
+  ],
   bootstrap: []
 })
 export class PageModule { }
