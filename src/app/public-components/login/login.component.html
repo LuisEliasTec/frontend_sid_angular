@@ -1,0 +1,66 @@
+<!-- <div class="jumbotron text-center">
+  <h1>{{ title }}!</h1>
+  <p>{{ title }}</p>
+</div>
+<div class="container">
+  <form [formGroup]="formdata" (ngSubmit)="onClickSubmit(formdata.value)">
+    <div class="form-group">
+      <label for="email">Email address:</label>
+      <input type="email" class="form-control" id="email" formControlName="email">
+      <div *ngIf="formdata.controls.email.errors && formdata.controls.email.touched" class="error">Email not valid</div>
+    </div>
+    <div class="form-group">
+      <label for="pwd">Password:</label>
+      <input type="password" class="form-control" id="pwd" formControlName="password">
+      <div *ngIf="formdata.controls.password.errors && formdata.controls.password.touched" class="error">Minimum length
+        5</div>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div> -->
+
+<section id="wrapper">
+  <div class="login-register responsiveLogin">
+    <div class="login-box card">
+      <div class="card-body">
+        <form [formGroup]="loginForm" (ngSubmit)="login()" #formDir="ngForm" class="form-horizontal form-material"
+          id="loginform">
+          <a href="javascript:void(0)" class="text-center db"><img class="uanLogoLogin"
+              src="../assets/images/uan/uan_logo.png" alt="UAN"></a>
+          <div style="margin-top: 3%  ;" class="form-group m-t-40 text-center">
+            <div class="col-xs-12">
+              <input formControlName="email" id="email" class="form-control inputLogin" type="text" name="email"
+                required="true" placeholder="CORREO ELECTRÓNICO">
+            </div>
+          </div>
+          <div class="form-group text-center">
+            <div class="col-xs-12">
+              <input formControlName="password" id="password" name="password" class="form-control inputLogin"
+                type="password" required="true" placeholder="CONTRASEÑA">
+            </div>
+          </div>
+          <div class="form-group row text-center">
+            <div class="col-md-12">
+              <div class="checkbox checkbox-primary p-t-0">
+                <input id="checkbox-signup" type="checkbox" class="filled-in chk-col-light-blue">
+                <label for="checkbox-signup" class="fontSize1"> Recordar contraseña </label>
+              </div>
+              <!-- <a href="javascript:void(0)" id="to-recover" class="text-dark fontSize1"><i class="fa fa-lock m-r-5"></i>
+                        ¿Olvidaste tu contraseña?</a> -->
+            </div>
+          </div>
+          <div class="form-group text-center m-t-20">
+            <div class="col-xs-12 flex" style="margin-bottom: 15px;">
+              <!-- <button class="btnLogin text-uppercase" type="submit">Iniciar sesión</button> -->
+              <button [disabled]="loginForm.invalid" class="bttn-login" type="submit">Acceder</button>
+            </div>
+            <!-- <a (click)="restorePassword()" id="to-recover" class="text-dark fontSize1" style="cursor: pointer;"><i
+                class="fa fa-lock m-r-5"></i>
+              ¿Olvidaste tu contraseña?</a> -->
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>

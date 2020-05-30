@@ -1,0 +1,97 @@
+<mat-card>
+
+  <h1>Procedimientos</h1>
+  <mat-divider></mat-divider>
+
+  <div class="py-3">
+    <button mat-raised-button color="primary" (click)="create()" matTooltip="Agregar nuevo registro">Agregar
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <!-- <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia"> -->
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Buscar">
+  </mat-form-field>
+
+  <div class="mat-elevation-z8">
+
+    <!-- <table mat-table [dataSource]="dataSource2" multiTemplateDataRows matSort>
+
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
+        <td mat-cell *matCellDef="let row">{{row.description}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+        <td mat-cell *matCellDef="let row">
+          <button mat-raised-button (click)="edit(row)">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+          </button>
+          &nbsp;
+          <button mat-raised-button (click)="delete(row.id)">
+            <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+          <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+            <div class="example-element-diagram">
+              <div class="example-element-position"> {{element.position}} </div>
+              <div class="example-element-symbol"> {{element.symbol}} </div>
+              <div class="example-element-name"> {{element.name}} </div>
+              <div class="example-element-weight"> {{element.weight}} </div>
+            </div>
+            <div class="example-element-description">
+              {{element.description}}
+              <span class="example-element-description-attribution"> -- Wikipedia </span>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let element; columns: columnsToDisplay;" class="example-element-row"
+        [class.example-expanded-row]="expandedElement === element"
+        (click)="expandedElement = expandedElement === element ? null : element">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+    </table>
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator> -->
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Descripción </th>
+          <td mat-cell *matCellDef="let row"> {{row.description}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-raised-button (click)="edit(row)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+            </button>
+            &nbsp;
+            <button mat-raised-button (click)="delete(row.id)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+
+  </div>
+
+</mat-card>
