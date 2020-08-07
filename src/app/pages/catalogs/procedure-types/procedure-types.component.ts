@@ -1,21 +1,21 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CrudService } from 'src/app/services/services.index';
 import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator } from '@angular/material';
-import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/procedure-dialog.component';
 import swal from 'sweetalert2';
 import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { REQUEST } from 'src/app/utils/enums/request.enum';
+import { ProcedureTypesDialogComponent } from './procedure-types-dialog/procedure-types-dialog.component';
 
 @Component({
-  selector: 'app-procedures',
-  templateUrl: './procedures.component.html',
-  styleUrls: ['./procedures.component.scss']
+  selector: 'app-procedure-types',
+  templateUrl: './procedure-types.component.html',
+  styleUrls: ['./procedure-types.component.scss']
 })
-export class ProceduresComponent implements OnInit, AfterViewInit {
+export class ProcedureTypesComponent implements OnInit {
 
   // MatTable
-  displayedColumns = ['name', 'description', 'price', 'procedure_type', 'actions'];
+  displayedColumns = ['name', 'actions'];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -26,7 +26,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar
   ) {
-    this.getProcedures();
+    this.getProcedureTypes();
   }
 
   ngOnInit() {
@@ -47,9 +47,11 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  getProcedures(offset = 0, pagesize?: number) {
+  getProcedureTypes(offset = 0, pagesize?: number) {
     try {
-      this.httpService.getAll(REQUEST.PROCEDURES).subscribe((res: any) => {
+      // this.filtros.offset = (offset > 0) ? offset - 1 : offset;
+      this.httpService.getAll(REQUEST.PROCEDURE_TYPES).subscribe((res: any) => {
+        // this.resultsLength = res.data.total;
         if (res.code === 200) {
           this.dataSource.data = res.data;
         } else {
@@ -64,14 +66,15 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   create() {
-    this.openDialog(false, 'Crear nuevo procedimiento', REQUEST.PROCEDURES);
+    this.openDialog(false, 'Crear nuevo tipo de procedimiento', REQUEST.PROCEDURE_TYPES);
   }
 
   edit(event) {
-    this.httpService.getBy(REQUEST.PROCEDURES, event.id).subscribe((res: any) => {
+    this.httpService.getBy(REQUEST.PROCEDURE_TYPES, event.id).subscribe((res: any) => {
+      // this.resultsLength = res.data.total;
       if (res.code === 200) {
         const result = res.data;
-        this.openDialog(true, 'Editar procedimiento', REQUEST.PROCEDURES, result);
+        this.openDialog(true, 'Editar tipo de procedimiento', REQUEST.PROCEDURE_TYPES, result);
       } else {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
@@ -83,10 +86,10 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   delete(id) {
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
-        this.httpService.delete(REQUEST.PROCEDURES, id).subscribe(
+        this.httpService.delete(REQUEST.PROCEDURE_TYPES, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
-              this.getProcedures();
+              this.getProcedureTypes();
               this.openSnackBar('Registro eliminado exitosamente.', 'success');
             } else {
               this.openSnackBar('Ocurrió un error.', 'error');
@@ -101,8 +104,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   openDialog(edit: boolean, title: string, path: any, data?: any) {
-    const dialogRef = this.dialog.open(ProcedureDialogComponent, {
-      // width: '40%',
+    const dialogRef = this.dialog.open(ProcedureTypesDialogComponent, {
       data: {
         edit: edit,
         data: data,
@@ -111,7 +113,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
       }
     });
     dialogRef.afterClosed().subscribe((res: any) => {
-      this.getProcedures();
+      this.getProcedureTypes();
     });
   }
 

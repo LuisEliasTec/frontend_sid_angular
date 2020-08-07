@@ -1,18 +1,19 @@
-import { Component, OnInit, Inject, InjectionToken, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Inject, InjectionToken } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CrudService } from 'src/app/services/services.index';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { GENDER } from "src/app/utils/enums/genders.enum";
+import { MARITAL_STATUS } from "src/app/utils/enums/marital_status.enum";
 import { REQUEST } from 'src/app/utils/enums/request.enum';
-import { MatSelectChange } from '@angular/material/select';
 
 @Component({
-  selector: 'app-procedure-dialog',
-  templateUrl: './procedure-dialog.component.html',
-  styleUrls: ['./procedure-dialog.component.scss']
+  selector: 'app-patients-dialog',
+  templateUrl: './patients-dialog.component.html',
+  styleUrls: ['./patients-dialog.component.scss']
 })
-export class ProcedureDialogComponent implements OnInit {
+export class PatientsDialogComponent implements OnInit {
 
   // Form groups
   formGroup: FormGroup;
@@ -20,39 +21,54 @@ export class ProcedureDialogComponent implements OnInit {
   // Strings
   dialog_title = '';
 
-  // Arrays
-  procedure_types = [];
-  consulting_rooms = [];
+  // Objects
+  genders = [
+    { value: GENDER.MASCULINO },
+    { value: GENDER.FEMENINO },
+  ];
 
-  // Booleans
-  is_therapy: boolean; 
+  marital_status = [
+    { value: MARITAL_STATUS.CASADO },
+    { value: MARITAL_STATUS.COMPROMETIDO },
+    { value: MARITAL_STATUS.DIVORCIADO },
+    { value: MARITAL_STATUS.EN_RELACION },
+    { value: MARITAL_STATUS.NOVIAZGO },
+    { value: MARITAL_STATUS.SEPARADO },
+    { value: MARITAL_STATUS.SOLTERO },
+    { value: MARITAL_STATUS.UNION_LIBRE },
+    { value: MARITAL_STATUS.VIUDO }
+  ];
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpService: CrudService,
-    public dialogRef: MatDialogRef<ProcedureDialogComponent>,
+    public dialogRef: MatDialogRef<PatientsDialogComponent>,
     private _snackBar: MatSnackBar
   ) {
+    console.log(dialogData);
     this.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
-      description: new FormControl(null, []),
-      price: new FormControl(null, []),
-      procedure_type: new FormControl(null, [Validators.required]),
-      consulting_room: new FormControl(null, [])
+      last_name_f: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
+      last_name_m: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
+      birth_date: new FormControl(null, [Validators.required]),
+      age: new FormControl(null, [Validators.required]),
+      gender: new FormControl(null, [Validators.required]),
+      phone_number: new FormControl(null, [Validators.required]),
+      optional_phone_number: new FormControl(null, [Validators.required]),
+      email: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
+      optional_email: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
+      marital_status: new FormControl(null, [Validators.required]),
+      number_children: new FormControl(null, [Validators.required]),
+      address_id: new FormControl(null, []),
+      zip_code: new FormControl(null, [])
     });
     this.dialog_title = dialogData.title;
-    this.getProcedureTypes();
-    this.getConsultingRooms();
   }
 
   ngOnInit() {
-    if (this.dialogData.data) {
-      this.formGroup.get('name').setValue(this.dialogData.data.name);
-      this.formGroup.get('description').setValue(this.dialogData.data.description);
-      this.formGroup.get('price').setValue(this.dialogData.data.price);
-      this.formGroup.get('procedure_type').setValue(this.dialogData.data.procedure_type_id);
-      this.formGroup.get('consulting_room').setValue(this.dialogData.data.consulting_rooms);
-    }
+    // if (this.dialogData.data) {
+    //   this.formGroup.get('description').setValue(this.dialogData.data.description);
+    // }
   }
 
   isEdit() {
@@ -64,6 +80,8 @@ export class ProcedureDialogComponent implements OnInit {
   }
 
   save() {
+    const data = this.formGroup.value;
+    data.address_id = 1;
     this.httpService.create(this.dialogData.path, this.formGroup.value).subscribe((res: any) => {
       if (res.code === 200) {
         this.dialogRef.close();
@@ -111,48 +129,20 @@ export class ProcedureDialogComponent implements OnInit {
     // });
   }
 
-  getProcedureTypes() {
-    try {
-      this.httpService.getAll(REQUEST.PROCEDURE_TYPES_LIST).subscribe((res: any) => {
+  searchByZipCodes() {
+    this.httpService.getAll(REQUEST.ZIP_CODES, this.formGroup.value).subscribe(
+      (res: any) => {
         if (res.code === 200) {
-          this.procedure_types = res.data;
+          console.log(res.data);
+          this.openSnackBar('Acción exitosa.', 'success');
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.openSnackBar('Ocurrió un error.', 'error');
         }
-      }, err => {
+      },
+      error => {
         this.openSnackBar('Ocurrió un error.', 'error');
-      });
-    } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
-    }
-  }
-
-  getConsultingRooms() {
-    try {
-      this.httpService.getAll(REQUEST.CONSULTING_ROOMS_LIST).subscribe((res: any) => {
-        if (res.code === 200) {
-          this.consulting_rooms = res.data;
-        } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
-        }
-      }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
-      });
-    } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
-    }
-  }
-
-  isTherapy(event) {
-    console.log(this.consulting_rooms);
-    const result = this.procedure_types.filter(procedure_type =>
-      procedure_type.id === this.formGroup.get("procedure_type").value);
-
-    if (result[0].name === 'Terapia') {
-      this.is_therapy = true;
-    } else {
-      this.is_therapy = false;
-    }
+      }
+    );
   }
 
 }

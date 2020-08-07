@@ -1,0 +1,335 @@
+<mat-sidenav-container class="">
+  <mat-sidenav #sidenav mode="over" closed class="example-sidenav">
+
+    <div class="container">
+
+      <h1>Lista de espera</h1>
+      <mat-divider></mat-divider>
+
+      <div class="py-3">
+        <button mat-raised-button color="primary" (click)="waitiningListCreate()"
+          matTooltip="Agregar nuevo registro">Agregar
+          <mat-icon aria-hidden="true">add</mat-icon>
+        </button>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <mat-form-field>
+            <mat-label>Buscar</mat-label>
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="table-container mat-elevation-z8">
+        <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" matSort>
+
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+            <td mat-cell *matCellDef="let row"> {{row.patient.name}} </td>
+          </ng-container>
+          <ng-container matColumnDef="last_name_f">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
+            <td mat-cell *matCellDef="let row"> {{row.patient.last_name_f}} </td>
+          </ng-container>
+          <ng-container matColumnDef="last_name_m">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
+            <td mat-cell *matCellDef="let row"> {{row.patient.last_name_m}} </td>
+          </ng-container>
+          <ng-container matColumnDef="procedure_type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento </th>
+            <td mat-cell *matCellDef="let row"> {{row.procedure_type ? row.procedure_type.name : '--'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="procedure">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
+            <td mat-cell *matCellDef="let row"> {{row.procedure ? row.procedure.name : '--'}} </td>
+          </ng-container>
+          <ng-container matColumnDef="appointment_type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
+            <td mat-cell *matCellDef="let row"> {{row.appointment_type}} </td>
+          </ng-container>
+          <ng-container matColumnDef="appointment_modality">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
+            <td mat-cell *matCellDef="let row"> {{row.appointment_modality}} </td>
+          </ng-container>
+          <ng-container matColumnDef="status_waitining_list">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
+            <td mat-cell *matCellDef="let row"> {{row.status_waitining_list}} </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+            <td mat-cell *matCellDef="let row">
+              <button mat-mini-fab color="basic" (click)="waitiningListEdit(row)" matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              &nbsp;
+              <button mat-mini-fab color="basic" (click)="deleteWaitiningList(row.id)" matTooltip="Eliminar">
+                <mat-icon>delete</mat-icon>
+              </button>
+              &nbsp;
+              <button mat-mini-fab color="basic" (click)="appointmentCreateByWaitiningList(row)"
+                matTooltip="Agendar cita">
+                <mat-icon>filter_list</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="expandedDetail">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+              <div class="example-element-detail"
+                [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+
+                <div class="table-multiplerow-width">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="th-multiplerow">Teléfono</th>
+                        <th class="th-multiplerow">Teléfono opcional</th>
+                        <th class="th-multiplerow">Email</th>
+                        <th class="th-multiplerow">Email opcional</th>
+                        <th class="th-multiplerow">Comentarios</th>
+                        <th class="th-multiplerow">¿Quién recomienda?</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{{ element.patient.phone_number }}</td>
+                        <td>{{ element.patient.optional_phone_number }}</td>
+                        <td>{{ element.patient.email }}</td>
+                        <td>{{ element.patient.optional_email }}</td>
+                        <td>{{ element.comments }}</td>
+                        <td>{{ element.who_recomend }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="example-element-row"
+            [class.example-expanded-row]="expandedElement === element"
+            (click)="expandedElement = expandedElement === element ? null : element">
+          </tr>
+          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+        </table>
+        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+
+      </div>
+    </div>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <div class="row text-center">
+
+      <context-menu #basicMenu>
+        <ng-template contextMenuItem (execute)="addEventContextMenu($event.item)">
+          Agendar
+        </ng-template>
+      </context-menu>
+
+      <ng-template #monthCellTemplate let-day="day" let-openDay="openDay" let-locale="locale"
+        let-tooltipPlacement="tooltipPlacement" let-highlightDay="highlightDay" let-unhighlightDay="unhighlightDay"
+        let-eventClicked="eventClicked">
+        <div class="fill-height" [contextMenu]="basicMenu" [contextMenuSubject]="day.date">
+          <div class="cal-cell-top">
+            <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+            <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+          </div>
+          <div class="cal-events">
+            <div class="cal-event" *ngFor="let event of day.events" [style.backgroundColor]="event.color.primary"
+              [ngClass]="event?.cssClass" (mouseenter)="highlightDay.emit({event: event})"
+              (mouseleave)="unhighlightDay.emit({event: event})"
+              [mwlCalendarTooltip]="event.title | calendarEventTitle:'monthTooltip':event"
+              [tooltipPlacement]="tooltipPlacement"
+              (click)="$event.stopPropagation(); eventClicked.emit({event: event})"></div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #weekHeaderTemplate let-days="days" let-locale="locale" let-dayHeaderClicked="dayHeaderClicked">
+        <div class="cal-day-headers">
+          <div class="cal-header" *ngFor="let day of days" [class.cal-past]="day.isPast" [class.cal-today]="day.isToday"
+            [class.cal-future]="day.isFuture" [class.cal-weekend]="day.isWeekend"
+            (click)="dayHeaderClicked.emit({day: day})" [contextMenu]="basicMenu" [contextMenuSubject]="day.date">
+            <b>{{ day.date | calendarDate:'weekViewColumnHeader':locale }}</b><br />
+            <span>{{ day.date | calendarDate:'weekViewColumnSubHeader':locale }}</span>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #dayHourSegmentTemplate let-segment="segment" let-locale="locale" let-segmentHeight="segmentHeight">
+        <div class="cal-hour-segment" [style.height.px]="segmentHeight" [class.cal-hour-start]="segment.isStart"
+          [class.cal-after-hour-start]="!segment.isStart" [ngClass]="segment.cssClass" [contextMenu]="basicMenu"
+          [contextMenuSubject]="segment.date">
+          <div class="cal-time">
+            {{ segment.date | calendarDate: 'dayViewHour':locale }}
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #weekViewHourSegment let-segment="segment" let-locale="locale" let-segmentHeight="segmentHeight"
+        let-isTimeLabel="isTimeLabel">
+        <div class="cal-hour-segment" [style.height.px]="segmentHeight" [class.cal-hour-start]="segment.isStart"
+          [class.cal-after-hour-start]="!segment.isStart" [ngClass]="segment.cssClass" [contextMenu]="basicMenu"
+          [contextMenuSubject]="segment.date">
+          <div class="cal-time" *ngIf="isTimeLabel">
+            {{ segment.date | calendarDate: 'weekViewHour':locale }}
+          </div>
+        </div>
+      </ng-template>
+
+      <div class="col-md-4">
+        <div class="btn-group">
+
+          <button mat-stroked-button (click)="sidenav.toggle()">Lista de espera</button>
+          <button mat-stroked-button (click)="appointmentCreate()">Agendar</button>
+          <!-- <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [value]="_activeValue">
+            <mat-button-toggle value="mes" (change)="onChange($event)" (click)="sidenav.toggle()">Lista de espera
+            </mat-button-toggle>
+            <mat-button-toggle value="semana" (change)="onChange($event)" (click)="appointmentCreate()">Agendar
+            </mat-button-toggle>
+          </mat-button-toggle-group> -->
+
+          &nbsp;
+
+          <!-- <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+            <mat-button-toggle value="anterior" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">Anterior</mat-button-toggle>
+            <mat-button-toggle value="hoy" mwlCalendarToday [(viewDate)]="viewDate">Hoy</mat-button-toggle>
+            <mat-button-toggle value="siguiente" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">Siguiente</mat-button-toggle>
+          </mat-button-toggle-group> -->
+
+          <!-- <div class="btn btn-primary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()">
+            Anterior
+          </div>
+          <div class="btn btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+            Hoy
+          </div>
+          <div class="btn btn-primary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()">
+            Siguiente
+          </div> -->
+
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn | titlecase}}</h3>
+      </div>
+
+      <div class="col-md-4">
+        <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+          <mat-button-toggle value="anterior" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()">Anterior</mat-button-toggle>
+          <mat-button-toggle value="hoy" mwlCalendarToday [(viewDate)]="viewDate">Hoy</mat-button-toggle>
+          <mat-button-toggle value="siguiente" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+            (viewDateChange)="closeOpenMonthViewDay()">Siguiente</mat-button-toggle>
+        </mat-button-toggle-group>
+        &nbsp;
+        <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
+          <mat-button-toggle value="mes" (click)="setView(CalendarView.Month)"
+            [class.active]="view === CalendarView.Month">Mes</mat-button-toggle>
+          <mat-button-toggle value="semana" (click)="setView(CalendarView.Week)"
+            [class.active]="view === CalendarView.Week">Semana</mat-button-toggle>
+          <mat-button-toggle value="dia" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">
+            Día</mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <!-- <div class="btn-group">
+          <div class="btn btn-primary" (click)="setView(CalendarView.Month)"
+            [class.active]="view === CalendarView.Month">
+            Mes
+          </div>
+          <div class="btn btn-primary" (click)="setView(CalendarView.Week)" [class.active]="view === CalendarView.Week">
+            Semana
+          </div>
+          <div class="btn btn-primary" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">
+            Día
+          </div>
+        </div> -->
+      </div>
+
+    </div>
+
+    <br />
+
+    <div [ngSwitch]="view">
+      <mwl-calendar-month-view *ngSwitchCase="CalendarView.Month" [viewDate]="viewDate" [events]="events"
+        [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)"
+        (eventTimesChanged)="eventTimesChanged($event)" [locale]="locale" [cellTemplate]="monthCellTemplate">
+      </mwl-calendar-month-view>
+      <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
+        [refresh]="refresh" (eventTimesChanged)="eventTimesChanged($event)" [locale]="locale"
+        [headerTemplate]="weekHeaderTemplate" [hourSegmentTemplate]="weekViewHourSegment">
+      </mwl-calendar-week-view>
+      <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events"
+        [refresh]="refresh" (eventTimesChanged)="eventTimesChanged($event)" [locale]="locale"
+        [hourSegmentTemplate]="dayHourSegmentTemplate">
+      </mwl-calendar-day-view>
+    </div>
+
+    <!-- Everything you see below is just for the demo, you don't need to include it in your app -->
+
+    <br /><br /><br />
+
+    <h3>
+      Edit events
+      <button class="btn btn-primary float-right" (click)="addEvent()">
+        Add new
+      </button>
+      <div class="clearfix"></div>
+    </h3>
+
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Primary color</th>
+            <th>Secondary color</th>
+            <th>Starts at</th>
+            <th>Ends at</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let event of events">
+            <td>
+              <input type="text" class="form-control" [(ngModel)]="event.title" (keyup)="refresh.next()" />
+            </td>
+            <td>
+              <input type="color" [(ngModel)]="event.color.primary" (change)="refresh.next()" />
+            </td>
+            <td>
+              <input type="color" [(ngModel)]="event.color.secondary" (change)="refresh.next()" />
+            </td>
+            <td>
+              <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="event.start"
+                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
+                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
+            </td>
+            <td>
+              <input class="form-control" type="text" mwlFlatpickr [(ngModel)]="event.end"
+                (ngModelChange)="refresh.next()" [altInput]="true" [convertModelValue]="true" [enableTime]="true"
+                dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i" placeholder="Not set" />
+            </td>
+            <td>
+              <button class="btn btn-danger" (click)="deleteEvent(event)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>

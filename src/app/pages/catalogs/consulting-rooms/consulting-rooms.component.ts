@@ -1,21 +1,21 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CrudService } from 'src/app/services/services.index';
 import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator } from '@angular/material';
-import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/procedure-dialog.component';
 import swal from 'sweetalert2';
 import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { REQUEST } from 'src/app/utils/enums/request.enum';
+import { ConsultingRoomsDialogComponent } from './consulting-rooms-dialog/consulting-rooms-dialog.component';
 
 @Component({
-  selector: 'app-procedures',
-  templateUrl: './procedures.component.html',
-  styleUrls: ['./procedures.component.scss']
+  selector: 'app-consulting-rooms',
+  templateUrl: './consulting-rooms.component.html',
+  styleUrls: ['./consulting-rooms.component.scss']
 })
-export class ProceduresComponent implements OnInit, AfterViewInit {
+export class ConsultingRoomsComponent implements OnInit {
 
   // MatTable
-  displayedColumns = ['name', 'description', 'price', 'procedure_type', 'actions'];
+  displayedColumns = ['name', 'actions'];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -26,7 +26,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar
   ) {
-    this.getProcedures();
+    this.getConsultingRooms();
   }
 
   ngOnInit() {
@@ -40,6 +40,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   applyFilter(filterValue: string) {
+    console.log(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     // if (this.dataSource.paginator) {
@@ -47,9 +48,9 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  getProcedures(offset = 0, pagesize?: number) {
+  getConsultingRooms(offset = 0, pagesize?: number) {
     try {
-      this.httpService.getAll(REQUEST.PROCEDURES).subscribe((res: any) => {
+      this.httpService.getAll(REQUEST.CONSULTING_ROOMS).subscribe((res: any) => {
         if (res.code === 200) {
           this.dataSource.data = res.data;
         } else {
@@ -64,14 +65,14 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   create() {
-    this.openDialog(false, 'Crear nuevo procedimiento', REQUEST.PROCEDURES);
+    this.openDialog(false, 'Crear nuevo consultorio', REQUEST.CONSULTING_ROOMS);
   }
 
   edit(event) {
-    this.httpService.getBy(REQUEST.PROCEDURES, event.id).subscribe((res: any) => {
+    this.httpService.getBy(REQUEST.CONSULTING_ROOMS, event.id).subscribe((res: any) => {
       if (res.code === 200) {
         const result = res.data;
-        this.openDialog(true, 'Editar procedimiento', REQUEST.PROCEDURES, result);
+        this.openDialog(true, 'Editar consultorio', REQUEST.CONSULTING_ROOMS, result);
       } else {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
@@ -83,10 +84,10 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   delete(id) {
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
-        this.httpService.delete(REQUEST.PROCEDURES, id).subscribe(
+        this.httpService.delete(REQUEST.CONSULTING_ROOMS, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
-              this.getProcedures();
+              this.getConsultingRooms();
               this.openSnackBar('Registro eliminado exitosamente.', 'success');
             } else {
               this.openSnackBar('Ocurrió un error.', 'error');
@@ -101,7 +102,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   openDialog(edit: boolean, title: string, path: any, data?: any) {
-    const dialogRef = this.dialog.open(ProcedureDialogComponent, {
+    const dialogRef = this.dialog.open(ConsultingRoomsDialogComponent, {
       // width: '40%',
       data: {
         edit: edit,
@@ -111,7 +112,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
       }
     });
     dialogRef.afterClosed().subscribe((res: any) => {
-      this.getProcedures();
+      this.getConsultingRooms();
     });
   }
 

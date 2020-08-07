@@ -11,10 +11,13 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SharedModule } from '../shared/shared.module';
+import { MedicalRecordsModule } from "./medical-records/medical-records.component.module";
+import { CatalogsModule } from './catalogs/catalogs.component.module';
+import { ScheduleModule } from './schedule/schedule.component.module';
 
 @NgModule({
   declarations: [
-    PagesComponent
+    PagesComponent,
   ],
   entryComponents: [],
   imports: [
@@ -26,7 +29,10 @@ import { SharedModule } from '../shared/shared.module';
     HttpClientModule,
     CommonModule,
     MatSnackBarModule,
-    SharedModule
+    SharedModule,
+    MedicalRecordsModule,
+    CatalogsModule,
+    ScheduleModule
   ],
   providers: [
     Service.ApiService,

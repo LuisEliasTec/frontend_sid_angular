@@ -1,21 +1,22 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CrudService } from 'src/app/services/services.index';
 import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator } from '@angular/material';
-import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/procedure-dialog.component';
 import swal from 'sweetalert2';
 import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { REQUEST } from 'src/app/utils/enums/request.enum';
+import { WaitiningListDialogComponent } from './waitining-list-dialog/waitining-list-dialog.component';
 
 @Component({
-  selector: 'app-procedures',
-  templateUrl: './procedures.component.html',
-  styleUrls: ['./procedures.component.scss']
+  selector: 'app-waitining-list',
+  templateUrl: './waitining-list.component.html',
+  styleUrls: ['./waitining-list.component.scss']
 })
-export class ProceduresComponent implements OnInit, AfterViewInit {
+export class WaitiningListComponent implements OnInit {
 
   // MatTable
-  displayedColumns = ['name', 'description', 'price', 'procedure_type', 'actions'];
+  displayedColumns = ['name', 'last_name_f', 'last_name_m', 'phone_number', 'email', 'procedure_type', 'procedure',
+    'appointment_type', 'appointment_modality', 'status_waitining_list', 'comments', 'who_recomend', 'actions'];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -26,7 +27,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar
   ) {
-    this.getProcedures();
+    this.getWaitiningList();
   }
 
   ngOnInit() {
@@ -47,9 +48,9 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  getProcedures(offset = 0, pagesize?: number) {
+  getWaitiningList(offset = 0, pagesize?: number) {
     try {
-      this.httpService.getAll(REQUEST.PROCEDURES).subscribe((res: any) => {
+      this.httpService.getAll(REQUEST.WAITINING_LIST).subscribe((res: any) => {
         if (res.code === 200) {
           this.dataSource.data = res.data;
         } else {
@@ -64,14 +65,15 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   create() {
-    this.openDialog(false, 'Crear nuevo procedimiento', REQUEST.PROCEDURES);
+    this.openDialog(false, 'Agregar a lista de espera', REQUEST.WAITINING_LIST);
   }
 
   edit(event) {
-    this.httpService.getBy(REQUEST.PROCEDURES, event.id).subscribe((res: any) => {
+    this.httpService.getBy(REQUEST.WAITINING_LIST, event.id).subscribe((res: any) => {
       if (res.code === 200) {
         const result = res.data;
-        this.openDialog(true, 'Editar procedimiento', REQUEST.PROCEDURES, result);
+        console.log(result);
+        this.openDialog(true, 'Editar lista de espera', REQUEST.WAITINING_LIST, result);
       } else {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
@@ -83,10 +85,10 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   delete(id) {
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
-        this.httpService.delete(REQUEST.PROCEDURES, id).subscribe(
+        this.httpService.delete(REQUEST.WAITINING_LIST, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
-              this.getProcedures();
+              this.getWaitiningList();
               this.openSnackBar('Registro eliminado exitosamente.', 'success');
             } else {
               this.openSnackBar('Ocurrió un error.', 'error');
@@ -101,8 +103,8 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   openDialog(edit: boolean, title: string, path: any, data?: any) {
-    const dialogRef = this.dialog.open(ProcedureDialogComponent, {
-      // width: '40%',
+    const dialogRef = this.dialog.open(WaitiningListDialogComponent, {
+      width: '50%',
       data: {
         edit: edit,
         data: data,
@@ -111,7 +113,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
       }
     });
     dialogRef.afterClosed().subscribe((res: any) => {
-      this.getProcedures();
+      this.getWaitiningList();
     });
   }
 

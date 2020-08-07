@@ -1,21 +1,23 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CrudService } from 'src/app/services/services.index';
-import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator } from '@angular/material';
-import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/procedure-dialog.component';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator, MatDialogConfig } from '@angular/material';
 import swal from 'sweetalert2';
 import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
-import { REQUEST } from 'src/app/utils/enums/request.enum';
+import { REQUEST } from "src/app/utils/enums/request.enum";
+import { PatientsDialogComponent } from './patients-dialog/patients-dialog.component';
 
 @Component({
-  selector: 'app-procedures',
-  templateUrl: './procedures.component.html',
-  styleUrls: ['./procedures.component.scss']
+  selector: 'app-patients',
+  templateUrl: './patients.component.html',
+  styleUrls: ['./patients.component.scss']
 })
-export class ProceduresComponent implements OnInit, AfterViewInit {
+export class PatientsComponent implements OnInit {
 
   // MatTable
-  displayedColumns = ['name', 'description', 'price', 'procedure_type', 'actions'];
+  displayedColumns = ["name", "last_name_f", "last_name_m", "birth_date", "age", "gender", "phone_number", "email",
+    "marital_status", "number_children", "zip_code"];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -26,7 +28,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar
   ) {
-    this.getProcedures();
+    this.getPatients();
   }
 
   ngOnInit() {
@@ -39,7 +41,17 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
+  // applyFilter(event: Event) {
+  //   const filterValue = (event.target as HTMLInputElement).value;
+  //   this.dataSource.filter = filterValue.trim().toLowerCase();
+
+  //   if (this.dataSource.paginator) {
+  //     this.dataSource.paginator.firstPage();
+  //   }
+  // }
+
   applyFilter(filterValue: string) {
+    console.log(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     // if (this.dataSource.paginator) {
@@ -47,9 +59,11 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     // }
   }
 
-  getProcedures(offset = 0, pagesize?: number) {
+  getPatients(offset = 0, pagesize?: number) {
     try {
-      this.httpService.getAll(REQUEST.PROCEDURES).subscribe((res: any) => {
+      // this.filtros.offset = (offset > 0) ? offset - 1 : offset;
+      this.httpService.getAll(REQUEST.PATIENTS).subscribe((res: any) => {
+        // this.resultsLength = res.data.total;
         if (res.code === 200) {
           this.dataSource.data = res.data;
         } else {
@@ -64,14 +78,15 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   create() {
-    this.openDialog(false, 'Crear nuevo procedimiento', REQUEST.PROCEDURES);
+    this.openDialog(false, 'Crear nuevo paciente', REQUEST.PATIENTS);
   }
 
   edit(event) {
-    this.httpService.getBy(REQUEST.PROCEDURES, event.id).subscribe((res: any) => {
+    this.httpService.getBy(REQUEST.PATIENTS, event.id).subscribe((res: any) => {
+      // this.resultsLength = res.data.total;
       if (res.code === 200) {
         const result = res.data;
-        this.openDialog(true, 'Editar procedimiento', REQUEST.PROCEDURES, result);
+        this.openDialog(true, 'Editar procedimiento', REQUEST.PATIENTS, result);
       } else {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
@@ -83,10 +98,10 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   delete(id) {
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
-        this.httpService.delete(REQUEST.PROCEDURES, id).subscribe(
+        this.httpService.delete(REQUEST.PATIENTS, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
-              this.getProcedures();
+              this.getPatients();
               this.openSnackBar('Registro eliminado exitosamente.', 'success');
             } else {
               this.openSnackBar('Ocurrió un error.', 'error');
@@ -100,9 +115,9 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     }).catch();
   }
 
-  openDialog(edit: boolean, title: string, path: any, data?: any) {
-    const dialogRef = this.dialog.open(ProcedureDialogComponent, {
-      // width: '40%',
+  openDialog(edit: boolean, title: string, path?: any, data?: any) {
+    const dialogRef = this.dialog.open(PatientsDialogComponent, {
+      width: '800px',
       data: {
         edit: edit,
         data: data,
@@ -111,7 +126,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
       }
     });
     dialogRef.afterClosed().subscribe((res: any) => {
-      this.getProcedures();
+      this.getPatients();
     });
   }
 

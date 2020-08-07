@@ -12,7 +12,7 @@ import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/pr
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule } from '@angular/material';
+import { MatPaginatorModule, MatSelectModule, MatGridListModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -35,7 +35,9 @@ import { MatPaginatorModule } from '@angular/material';
     MatDividerModule,
     MatTooltipModule,
     MatSortModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSelectModule,
+    MatGridListModule
   ],
   providers: [],
   bootstrap: []
