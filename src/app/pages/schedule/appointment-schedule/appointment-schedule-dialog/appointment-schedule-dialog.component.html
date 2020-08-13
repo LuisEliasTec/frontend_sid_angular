@@ -1,4 +1,5 @@
-<h2 mat-dialog-title>{{ dialog_title }}</h2>
+<h2 mat-dialog-title class="modal-title-center">{{ dialog_title }}</h2>
+<mat-divider></mat-divider>
 
 <form class="example-form" [formGroup]="formGroup">
   <mat-dialog-content>
@@ -151,11 +152,11 @@
       <!-- <mat-grid-tile [colspan]="12" [rowspan]="1"></mat-grid-tile> -->
 
       <div>
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1">
           <mat-form-field>
             <mat-label>Tipo de procedimiento</mat-label>
             <mat-select formControlName="procedure_type" name="procedure_type"
-              (selectionChange)="selectProcedureType($event)">
+              (selectionChange)="selectProcedureType($event); isTherapy($event.value);">
               <mat-option *ngFor="let item of procedure_types" [value]="item.id">
                 {{item.name}}
               </mat-option>
@@ -163,7 +164,7 @@
           </mat-form-field>
         </mat-grid-tile>
 
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1">
           <mat-form-field>
             <mat-label>Procedimiento</mat-label>
             <mat-select formControlName="procedure" name="procedure">
@@ -174,7 +175,7 @@
           </mat-form-field>
         </mat-grid-tile>
 
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1" *ngIf="!is_therapy">
           <mat-form-field>
             <mat-label>Tipo de cita</mat-label>
             <mat-select formControlName="appointment_type" name="appointment_type">
@@ -185,7 +186,7 @@
           </mat-form-field>
         </mat-grid-tile>
 
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1" *ngIf="!is_therapy">
           <mat-form-field>
             <mat-label>Modalidad</mat-label>
             <mat-select formControlName="appointment_modality" name="appointment_modality">
@@ -196,7 +197,7 @@
           </mat-form-field>
         </mat-grid-tile>
 
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1">
           <mat-form-field>
             <mat-label>Fecha</mat-label>
             <input matInput [matDatepicker]="picker" formControlName="appointment_date">
@@ -205,28 +206,7 @@
           </mat-form-field>
         </mat-grid-tile>
 
-        <!-- <mat-grid-tile [colspan]="3" [rowspan]="1">
-          <mat-form-field>
-            <input matInput [ngxMatDatetimePicker]="picker1" placeholder="Choose a date"
-              formControlName="appointment_date">
-            <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
-            <ngx-mat-datetime-picker #picker1></ngx-mat-datetime-picker>
-          </mat-form-field>
-        </mat-grid-tile>
-
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
-          <mat-form-field>
-            <input matInput [ngxMatDatetimePicker]="picker" placeholder="Choose a date"
-              formControlName="appointment_date" [min]="minDate" [max]="maxDate" [disabled]="disabled">
-            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-            <ngx-mat-datetime-picker #picker [showSpinners]="showSpinners" [showSeconds]="showSeconds"
-              [stepHour]="stepHour" [stepMinute]="stepMinute" [stepSecond]="stepSecond" [touchUi]="touchUi"
-              [color]="color" [enableMeridian]="enableMeridian">
-            </ngx-mat-datetime-picker>
-          </mat-form-field>
-        </mat-grid-tile> -->
-
-        <mat-grid-tile [colspan]="3" [rowspan]="1">
+        <mat-grid-tile [colspan]="4" [rowspan]="1">
           <mat-form-field>
             <mat-label>Hora</mat-label>
             <input matInput type="time" value="{{ formGroup.get('appointment_time').value }}"
@@ -265,15 +245,6 @@
       </div>
 
     </mat-grid-list>
-
-    <!-- <div>
-      Action:
-      <pre>{{ dialogData.action }}</pre>
-    </div>
-    <div>
-      Event:
-      <pre>{{ dialogData.event | json }}</pre>
-    </div> -->
 
   </mat-dialog-content>
 

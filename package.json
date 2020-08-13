@@ -33,6 +33,7 @@
     "moment": "^2.27.0",
     "ngx-contextmenu": "^5.4.0",
     "node-sass": "^4.14.1",
+    "notyf": "^3.9.0",
     "rxjs": "~6.3.3",
     "rxjs-compat": "^6.3.3",
     "sweetalert2": "^7.29.0",

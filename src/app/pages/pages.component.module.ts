@@ -38,6 +38,7 @@ import { ScheduleModule } from './schedule/schedule.component.module';
     Service.ApiService,
     Service.CrudService,
     Service.SessionService,
+    Service.NotyfService,
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
   ],
   bootstrap: []

@@ -6,13 +6,6 @@
     right: 0;
   }
   
-  .example-sidenav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 70%;
-  }
-  
   .example-header {
     position: fixed;
     top: 0;
@@ -73,21 +66,18 @@
     opacity: 0.5;
   }
 
-  // Table bootstrap
+  // Table
 
   .th-multiplerow {
     font-weight: normal !important;
   }
 
-  th {
-    background-color: rgb(240, 240, 240);
+  .table-multiplerow-width {
+    width: 100% !important
   }
-  
-  // Angular Calendar
 
-  .fill-height {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+  .mat-paginator-sticky {
+    bottom: 0px;
+    position: sticky;
+    z-index: 10;
   }

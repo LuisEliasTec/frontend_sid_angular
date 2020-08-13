@@ -1,8 +1,8 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { APPOINTMENT_TYPE, APPOINTMENT_MODALITY, STATUS_APPOINTMENT_SCHEDULE } from 'src/app/utils/enums/appointment_parameters.enum';
-import { CrudService } from 'src/app/services/services.index';
+import { APPOINTMENT_TYPE, APPOINTMENT_MODALITY, STATUS_APPOINTMENT_SCHEDULE, PROCEDURE_TYPE } from 'src/app/utils/enums/appointment_parameters.enum';
+import { CrudService, NotyfService } from 'src/app/services/services.index';
 import { MatSnackBar, ThemePalette } from '@angular/material';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { REQUEST } from 'src/app/utils/enums/request.enum';
@@ -11,6 +11,7 @@ import { MARITAL_STATUS } from 'src/app/utils/enums/marital_status.enum';
 import { AmazingTimePickerService } from 'amazing-time-picker'; // this line you need
 import * as moment from 'moment';
 import { TimeFormat } from 'src/app/utils/timeFormat';
+import { NgControl } from '@angular/forms';
 
 @Component({
   selector: 'app-appointment-schedule-dialog',
@@ -19,8 +20,12 @@ import { TimeFormat } from 'src/app/utils/timeFormat';
 })
 export class AppointmentScheduleDialogComponent implements OnInit {
 
+  // Date
   date: Date;
+
+  // Boolean
   filterOdd: boolean;
+  is_therapy = false;
 
   // Form groups
   formGroup: FormGroup;
@@ -31,6 +36,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
   // Strings
   dialog_title = '';
   public selectedTime = '';
+  public procedure_type_therapy = PROCEDURE_TYPE.TERAPIA;
 
   // Objects
   appointment_types = [
@@ -76,7 +82,8 @@ export class AppointmentScheduleDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpService: CrudService,
     private _snackBar: MatSnackBar,
-    private atp: AmazingTimePickerService) {
+    private atp: AmazingTimePickerService,
+    private notyf: NotyfService) {
     this.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.maxLength(255)]),
       last_name_f: new FormControl(null, [Validators.maxLength(255)]),
@@ -92,8 +99,8 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       comments: new FormControl(null, []),
       procedure_type: new FormControl(null, [Validators.required]),
       procedure: new FormControl(null, [Validators.required]),
-      appointment_type: new FormControl(null, [Validators.required]),
-      appointment_modality: new FormControl(null, [Validators.required]),
+      appointment_type: new FormControl(null, []),
+      appointment_modality: new FormControl(null, []),
       status_appointment_schedule: new FormControl(null, []),
       appointment_date: new FormControl(null, [Validators.required]),
       appointment_time: new FormControl(null, [Validators.required]),
@@ -106,6 +113,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
 
   ngOnInit() {
     if (this.dialogData.data) {
+      this.formGroup.get('procedure').enable();
 
       if (this.dialogData.edit) {
         // Editar
@@ -143,7 +151,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
           this.formGroup.get('name').disable();
           this.formGroup.get('last_name_f').disable();
           this.formGroup.get('last_name_m').disable();
-          this.formGroup.get('status_appointment_schedule').disable();
+          // this.formGroup.get('status_appointment_schedule').disable();
         } else {
           // Context menu
           const hour = moment(this.dialogData.data.appointment_date).format('HH:mm');
@@ -199,6 +207,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       // this.formGroup.get('status_appointment_schedule').disable();
       this.formGroup.get('status_appointment_schedule').setValue(STATUS_APPOINTMENT_SCHEDULE.PENDIENTE);
       this.formGroup.controls['patient_id'].setValidators([Validators.required]);
+      this.formGroup.get('procedure').disable();
     }
   }
 
@@ -221,12 +230,12 @@ export class AppointmentScheduleDialogComponent implements OnInit {
     this.httpService.create(this.dialogData.path, this.formGroup.value).subscribe((res: any) => {
       if (res.code === 200) {
         this.dialogRef.close();
-        this.openSnackBar('Registro exitoso.', 'success');
+        this.notyf.setSuccess();
       } else {
-        this.openSnackBar(res.message, 'error');
+        this.notyf.setErrorWithMessage(res.message);
       }
     }, err => {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     });
   }
 
@@ -237,13 +246,13 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       (res: any) => {
         if (res.code === 200) {
           this.dialogRef.close();
-          this.openSnackBar('Actualización exitosa.', 'success');
+          this.notyf.setSuccess();
         } else {
-          this.openSnackBar(res.message, '');
+          this.notyf.setErrorWithMessage(res.message);
         }
       },
       error => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       }
     );
   }
@@ -272,14 +281,15 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       this.httpService.getAll(REQUEST.PROCEDURE_TYPES_LIST).subscribe((res: any) => {
         if (res.code === 200) {
           this.procedure_types = res.data;
+          console.log(this.procedure_types);
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -289,18 +299,20 @@ export class AppointmentScheduleDialogComponent implements OnInit {
         procedure_type_id: event.value ? event.value : event
       }).subscribe((res: any) => {
         if (res.code === 200) {
+          this.formGroup.get('procedure').enable();
           this.procedures = res.data;
+
           if (!this.dialogData.data) {
             this.formGroup.get('procedure').reset();
           }
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -310,13 +322,13 @@ export class AppointmentScheduleDialogComponent implements OnInit {
         if (res.code === 200) {
           this.patients = res.data;
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -335,13 +347,13 @@ export class AppointmentScheduleDialogComponent implements OnInit {
           this.formGroup.get('marital_status').setValue(res.data.marital_status);
           this.formGroup.get('number_children').setValue(res.data.number_children);
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -445,6 +457,18 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       // this.formGroup.controls['optional_email'].updateValueAndValidity();
       this.formGroup.controls['marital_status'].updateValueAndValidity();
       this.formGroup.controls['number_children'].updateValueAndValidity();
+    }
+  }
+
+  isTherapy(id) {
+    if (id && this.procedure_types) {
+
+      const is_therapy = this.procedure_types.filter(
+        element => element.id == id);
+
+      console.log(is_therapy[0].name === PROCEDURE_TYPE.TERAPIA);
+      this.is_therapy = is_therapy[0].name === PROCEDURE_TYPE.TERAPIA;
+
     }
   }
 

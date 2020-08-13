@@ -27,7 +27,7 @@ import {
 import { AppointmentScheduleDialogComponent } from './appointment-schedule-dialog/appointment-schedule-dialog.component';
 import { MatDialog, MatTableDataSource, MatSort, MatPaginator, MatSnackBar } from '@angular/material';
 import { animate, state, style, transition, trigger } from '@angular/animations';
-import { CrudService } from 'src/app/services/services.index';
+import { CrudService, NotyfService } from 'src/app/services/services.index';
 import { REQUEST } from 'src/app/utils/enums/request.enum';
 import { Utils } from 'src/app/utils/utils';
 import { WaitiningListDialogComponent } from '../waitining-list/waitining-list-dialog/waitining-list-dialog.component';
@@ -37,6 +37,7 @@ import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 import * as moment from 'moment';
 import { TimeFormat } from 'src/app/utils/timeFormat';
 import { elementEnd } from '@angular/core/src/render3';
+import { PROCEDURE_TYPE } from 'src/app/utils/enums/appointment_parameters.enum';
 
 const colors: any = {
   red: {
@@ -160,7 +161,8 @@ export class AppointmentScheduleComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private httpService: CrudService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private notyf: NotyfService
   ) {
     this.getWaitiningList();
     this.getAppointmentSchedules();
@@ -186,38 +188,46 @@ export class AppointmentScheduleComponent implements OnInit {
       this.httpService.getAll(REQUEST.APPOINTMENT_SCHEDULE).subscribe((res: any) => {
         if (res.code === 200) {
           console.log(res.data);
-          let appointment_schedules_mapped = res.data.map(element => {
-            const backDate = new Date(element.appointment_date);
-            const resultDate = new TimeFormat().setDate(backDate, element.appointment_time);
-            return {
-              start: resultDate,
-              title: element.patient.name + ' ' + element.patient.last_name_f + ' ' + element.patient.last_name_m + ' | ' + element.procedure.name + ' | ' + element.appointment_time,
-              color: colors.red,
-              actions: this.actions,
-              allDay: false,
-              resizable: {
-                beforeStart: true,
-                afterEnd: true,
-              },
-              draggable: true,
-              id: element.id,
-              procedure_type: element.procedure_type,
-              procedure: element.procedure,
-              status_appointment_schedule: element.status_appointment_schedule,
-              appointment_type: element.appointment_type,
-              appointment_modality: element.appointment_modality,
-            };
-          })
-          this.events = appointment_schedules_mapped;
-          this.refresh.next();
+
+          if (res.data.length > 0) {
+            let appointment_schedules_mapped = res.data.map(element => {
+              const resultDate = new TimeFormat().setDate(new Date(element.appointment_date), element.appointment_time);
+              const is_therapy = element.procedure_type.name !== PROCEDURE_TYPE.TERAPIA ? ' | ' + element.appointment_type + ' | ' : ' | ';
+
+              return {
+                start: resultDate,
+                title: element.patient.name + ' ' + element.patient.last_name_f + ' ' + element.patient.last_name_m + ' | ' + element.procedure.name +
+                  is_therapy + moment(element.appointment_time, 'h:mm a').format('h:mm a') + ' | ' + element.status_appointment_schedule,
+                color: colors.red,
+                actions: this.actions,
+                allDay: false,
+                resizable: {
+                  beforeStart: true,
+                  afterEnd: true,
+                },
+                draggable: true,
+                id: element.id,
+                procedure_type: element.procedure_type,
+                procedure: element.procedure,
+                status_appointment_schedule: element.status_appointment_schedule,
+                appointment_type: element.appointment_type,
+                appointment_modality: element.appointment_modality,
+              };
+
+            });
+
+            this.events = appointment_schedules_mapped;
+            this.refresh.next();
+          }
+
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -226,15 +236,14 @@ export class AppointmentScheduleComponent implements OnInit {
       this.httpService.getAll(REQUEST.WAITINING_LIST).subscribe((res: any) => {
         if (res.code === 200) {
           this.dataSource.data = res.data;
-          console.log('lista de espera', res.data);
         } else {
-          this.openSnackBar('Ocurrió un error.', 'success');
+          this.notyf.setErrorWithMessage(res.message);
         }
       }, err => {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setError();
       });
     } catch (error) {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     }
   }
 
@@ -245,13 +254,13 @@ export class AppointmentScheduleComponent implements OnInit {
   waitiningListEdit(event) {
     this.httpService.getBy(REQUEST.WAITINING_LIST, event.id).subscribe((res: any) => {
       if (res.code === 200) {
-        const result = res.data;
-        this.openWaitiningListDialog(true, 'Editar lista de espera', REQUEST.WAITINING_LIST, result);
+        // const result = res.data;
+        this.openWaitiningListDialog(true, 'Editar lista de espera', REQUEST.WAITINING_LIST, res.data);
       } else {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setErrorWithMessage(res.message);
       }
     }, err => {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     });
   }
 
@@ -262,13 +271,13 @@ export class AppointmentScheduleComponent implements OnInit {
           (res: any) => {
             if (res.code === 200) {
               this.getWaitiningList();
-              this.openSnackBar('Registro eliminado exitosamente.', 'success');
+              this.notyf.setSuccess();
             } else {
-              this.openSnackBar('Ocurrió un error.', 'error');
+              this.notyf.setErrorWithMessage(res.message);
             }
           },
           error => {
-            this.openSnackBar('Ocurrió un error.', 'error');
+            this.notyf.setError();
           }
         );
       }
@@ -289,10 +298,10 @@ export class AppointmentScheduleComponent implements OnInit {
         const result = res.data;
         this.openAppointmentDialog(false, 'Agendar cita', REQUEST.APPOINTMENT_SCHEDULE, true, result);
       } else {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setErrorWithMessage(res.message)
       }
     }, err => {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     });
   }
 
@@ -300,32 +309,30 @@ export class AppointmentScheduleComponent implements OnInit {
     console.log(event);
     this.httpService.getBy(REQUEST.APPOINTMENT_SCHEDULE, event.id).subscribe((res: any) => {
       if (res.code === 200) {
-        const result = res.data;
-        console.log(res.data);
-        this.openAppointmentDialog(true, 'Editar cita', REQUEST.APPOINTMENT_SCHEDULE, false, result);
+        // const result = res.data;
+        this.openAppointmentDialog(true, 'Editar cita', REQUEST.APPOINTMENT_SCHEDULE, false, res.data);
       } else {
-        this.openSnackBar('Ocurrió un error.', 'error');
+        this.notyf.setErrorWithMessage(res.message);
       }
     }, err => {
-      this.openSnackBar('Ocurrió un error.', 'error');
+      this.notyf.setError();
     });
   }
 
   deleteAppointmentSchedule(id) {
-    console.log(id);
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
         this.httpService.delete(REQUEST.APPOINTMENT_SCHEDULE, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
               this.getAppointmentSchedules();
-              this.openSnackBar('Registro eliminado exitosamente.', 'success');
+              this.notyf.setSuccess();
             } else {
-              this.openSnackBar('Ocurrió un error.', 'error');
+              this.notyf.setErrorWithMessage(res.message);
             }
           },
           error => {
-            this.openSnackBar('Ocurrió un error.', 'error');
+            this.notyf.setError();
           }
         );
       }
@@ -334,7 +341,10 @@ export class AppointmentScheduleComponent implements OnInit {
 
   openWaitiningListDialog(edit: boolean, title: string, path: any, data?: any) {
     const dialogRef = this.dialog.open(WaitiningListDialogComponent, {
-      width: '50%',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      width: '750px',
+      height: 'auto',
       data: {
         edit: edit,
         data: data,
@@ -349,10 +359,11 @@ export class AppointmentScheduleComponent implements OnInit {
 
   openAppointmentDialog(edit: boolean, title: string, path: any, fromWaitiningList: boolean, data?: any) {
     const dialogRef = this.dialog.open(AppointmentScheduleDialogComponent, {
-      // width: '50%',
-      height: '500px',
-      width: '700px',
-      // margin: '0 auto',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      width: '750px',
+      // height: '85vh',
+      height: 'auto',
       disableClose: true,
       hasBackdrop: true,
       data: {
@@ -485,6 +496,13 @@ export class AppointmentScheduleComponent implements OnInit {
     } else {
       this._activeValue = event.value;
     }
+  }
+
+  notyfTest() {
+    this.notyf.setSuccess();
+    this.notyf.setInfo('Test info');
+    this.notyf.setWarning('Warning test');
+    this.notyf.setError();
   }
 
 }

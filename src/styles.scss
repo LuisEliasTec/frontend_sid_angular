@@ -9,10 +9,15 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+
+// Snackbar Angular Material
+
 .background-snackbar-white {
   background-color: white;
   color: black;
 }
+
+// Forms Angular Material
 
 mat-form-field {
   width: 80%;
@@ -30,6 +35,91 @@ table {
   overflow: auto;
 }
 
-.table-multiplerow-width {
-  width: 100% !important
+.th-principal-color {
+  background-color: rgb(241, 241, 241);
+}
+
+.th-multiplerow-customized {
+  // border-top-style: none;
+  // border-bottom-style: none;
+  font-size: 12px !important;
+}
+
+.multiplerow-bg-color {
+  background-color: rgb(241, 241, 241);
+}
+
+// Action buttons table
+
+.btn-action-edit, .btn-action-delete, .btn-action-appointment {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.btn-action-edit:hover {
+  color: blue;
+}
+
+.btn-action-delete:hover {
+  color: red;
+}
+
+.btn-action-appointment:hover {
+  color: blue;
+}
+
+.btn-add {
+  transition-duration: 0.1s, 0.1s;
+}
+
+.btn-add:hover {
+  background-color: #8BC34A;
+  color: white;
+  transition-duration: 0.1s, 0.1s;
+}
+
+// Notyf classes
+
+.notyf-text-color {
+  color: black;
+}
+
+// Dialogs
+
+@media (max-width: 600px) {
+  // Making the modal fullscreen in mobiles
+  .cdk-overlay-pane {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+}
+
+.modal-title-center {
+  text-align: center !important;
+}
+
+// Angular calendar
+
+.fill-height {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+// Sidenav
+
+.sidenav-waitining-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+}
+
+@media (max-width: 600px) {
+  // Making the modal fullscreen in mobiles
+  .sidenav-waitining-list {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
 }

@@ -28,12 +28,7 @@ import { AppointmentScheduleModule } from './appointment-schedule/appointment-sc
         WaitingListModule,
         AppointmentScheduleModule
     ],
-    providers: [
-        Service.ApiService,
-        Service.CrudService,
-        Service.SessionService,
-        { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true } }
-    ],
+    providers: [],
     bootstrap: []
 })
 export class ScheduleModule { }

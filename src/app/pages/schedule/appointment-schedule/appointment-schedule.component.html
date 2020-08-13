@@ -1,5 +1,5 @@
 <mat-sidenav-container class="">
-  <mat-sidenav #sidenav mode="over" closed class="example-sidenav">
+  <mat-sidenav #sidenav mode="over" closed class="sidenav-waitining-list">
 
     <div class="container">
 
@@ -7,9 +7,8 @@
       <mat-divider></mat-divider>
 
       <div class="py-3">
-        <button mat-raised-button color="primary" (click)="waitiningListCreate()"
-          matTooltip="Agregar nuevo registro">Agregar
-          <mat-icon aria-hidden="true">add</mat-icon>
+        <button mat-raised-button class="btn-add" (click)="waitiningListCreate()" matTooltip="Agregar nuevo registro">
+          <mat-icon aria-hidden="true">add</mat-icon> Agregar
         </button>
       </div>
 
@@ -22,45 +21,45 @@
         </div>
       </div>
 
-      <div class="table-container mat-elevation-z8">
+      <div class="table-container">
         <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" matSort>
 
           <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
             <td mat-cell *matCellDef="let row"> {{row.patient.name}} </td>
           </ng-container>
           <ng-container matColumnDef="last_name_f">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
             <td mat-cell *matCellDef="let row"> {{row.patient.last_name_f}} </td>
           </ng-container>
           <ng-container matColumnDef="last_name_m">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
             <td mat-cell *matCellDef="let row"> {{row.patient.last_name_m}} </td>
           </ng-container>
           <ng-container matColumnDef="procedure_type">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento </th>
             <td mat-cell *matCellDef="let row"> {{row.procedure_type ? row.procedure_type.name : '--'}} </td>
           </ng-container>
           <ng-container matColumnDef="procedure">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
             <td mat-cell *matCellDef="let row"> {{row.procedure ? row.procedure.name : '--'}} </td>
           </ng-container>
           <ng-container matColumnDef="appointment_type">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
             <td mat-cell *matCellDef="let row"> {{row.appointment_type}} </td>
           </ng-container>
           <ng-container matColumnDef="appointment_modality">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
             <td mat-cell *matCellDef="let row"> {{row.appointment_modality}} </td>
           </ng-container>
           <ng-container matColumnDef="status_waitining_list">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
             <td mat-cell *matCellDef="let row"> {{row.status_waitining_list}} </td>
           </ng-container>
           <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
             <td mat-cell *matCellDef="let row">
-              <button mat-mini-fab color="basic" (click)="waitiningListEdit(row)" matTooltip="Editar">
+              <!-- <button mat-mini-fab color="basic" (click)="waitiningListEdit(row)" matTooltip="Editar">
                 <mat-icon>edit</mat-icon>
               </button>
               &nbsp;
@@ -71,19 +70,25 @@
               <button mat-mini-fab color="basic" (click)="appointmentCreateByWaitiningList(row)"
                 matTooltip="Agendar cita">
                 <mat-icon>filter_list</mat-icon>
-              </button>
+              </button> -->
+
+              <mat-icon class="btn-action-edit" (click)="waitiningListEdit(row)" matTooltip="Editar">edit</mat-icon>
+              <mat-icon class="btn-action-delete" (click)="deleteWaitiningList(row)" matTooltip="Eliminar">delete
+              </mat-icon>
+              <mat-icon class="btn-action-appointment" (click)="appointmentCreateByWaitiningList(row)"
+                matTooltip="Agendar cita">calendar_today</mat-icon>
             </td>
           </ng-container>
 
           <ng-container matColumnDef="expandedDetail">
-            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length">
+            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="multiplerow-bg-color">
               <div class="example-element-detail"
                 [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
 
-                <div class="table-multiplerow-width">
+                <div class="">
                   <table class="table">
                     <thead>
-                      <tr>
+                      <tr class="th-multiplerow-customized">
                         <th class="th-multiplerow">Teléfono</th>
                         <th class="th-multiplerow">Teléfono opcional</th>
                         <th class="th-multiplerow">Email</th>
@@ -116,9 +121,10 @@
           </tr>
           <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 
       </div>
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+
     </div>
 
   </mat-sidenav>
@@ -128,7 +134,7 @@
 
       <context-menu #basicMenu>
         <ng-template contextMenuItem (execute)="addEventContextMenu($event.item)">
-          Agendar
+          Agendar cita
         </ng-template>
       </context-menu>
 
@@ -188,6 +194,7 @@
 
           <button mat-stroked-button (click)="sidenav.toggle()">Lista de espera</button>
           <button mat-stroked-button (click)="appointmentCreate()">Agendar</button>
+          <button mat-stroked-button (click)="notyfTest()">Notyf</button>
           <!-- <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [value]="_activeValue">
             <mat-button-toggle value="mes" (change)="onChange($event)" (click)="sidenav.toggle()">Lista de espera
             </mat-button-toggle>
@@ -221,7 +228,7 @@
       </div>
 
       <div class="col-md-4">
-        <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn | titlecase}}</h3>
+        <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):locale:weekStartsOn | titlecase }}</h3>
       </div>
 
       <div class="col-md-4">
