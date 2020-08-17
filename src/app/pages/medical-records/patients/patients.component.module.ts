@@ -10,7 +10,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule, MatDatepickerModule, MatNativeDateModule, MAT_DATE_LOCALE, MatSelectModule, MatGridListModule } from '@angular/material';
+import { MatPaginatorModule, MatDatepickerModule, MatNativeDateModule, MAT_DATE_LOCALE, MatSelectModule, MatGridListModule, MatTabsModule } from '@angular/material';
 import { PatientsComponent } from "./patients.component";
 import { PatientsDialogComponent } from './patients-dialog/patients-dialog.component';
 
@@ -40,7 +40,8 @@ import { PatientsDialogComponent } from './patients-dialog/patients-dialog.compo
         MatDatepickerModule,
         MatNativeDateModule,
         MatSelectModule,
-        MatGridListModule
+        MatGridListModule,
+        MatTabsModule
     ],
     providers: [
         {provide: MAT_DATE_LOCALE, useValue: 'es'}

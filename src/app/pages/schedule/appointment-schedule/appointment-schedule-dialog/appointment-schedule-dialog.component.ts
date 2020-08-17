@@ -22,6 +22,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
 
   // Date
   date: Date;
+  minDate = moment();
 
   // Boolean
   filterOdd: boolean;
@@ -104,16 +105,19 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       status_appointment_schedule: new FormControl(null, []),
       appointment_date: new FormControl(null, [Validators.required]),
       appointment_time: new FormControl(null, [Validators.required]),
-      patient_id: new FormControl(null, [])
+      patient_id: new FormControl(null, []),
+      from_waitining_list: new FormControl(null, [])
     });
     this.dialog_title = dialogData.title;
     this.getProcedureTypes();
     this.getAllPatients();
+
   }
 
   ngOnInit() {
     if (this.dialogData.data) {
       this.formGroup.get('procedure').enable();
+      const appointment_date_moment = moment(this.dialogData.data.appointment_date).format();
 
       if (this.dialogData.edit) {
         // Editar
@@ -128,7 +132,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
         this.formGroup.get('appointment_modality').setValue(this.dialogData.data.appointment_modality);
         this.formGroup.get('status_appointment_schedule').setValue(this.dialogData.data.status_appointment_schedule);
         this.formGroup.get('patient_id').setValue(this.dialogData.data.patient_id);
-        this.formGroup.get('appointment_date').setValue(this.dialogData.data.appointment_date);
+        this.formGroup.get('appointment_date').setValue(appointment_date_moment);
         this.formGroup.get('appointment_time').setValue(this.dialogData.data.appointment_time);
       } else {
         if (this.dialogData.fromWaitiningList) {
@@ -152,56 +156,20 @@ export class AppointmentScheduleDialogComponent implements OnInit {
           this.formGroup.get('last_name_f').disable();
           this.formGroup.get('last_name_m').disable();
           // this.formGroup.get('status_appointment_schedule').disable();
+
+          this.formGroup.get('from_waitining_list').setValue(this.dialogData.data.id); 
         } else {
           // Context menu
           const hour = moment(this.dialogData.data.appointment_date).format('HH:mm');
-          this.formGroup.get('appointment_date').setValue(moment(this.dialogData.data.appointment_date).format('YYYY-MM-DD'));
+          // this.formGroup.get('appointment_date').setValue(moment(this.dialogData.data.appointment_date).format('YYYY-MM-DD'));
+          this.formGroup.get('appointment_date').setValue(appointment_date_moment);
+          this.formGroup.get('status_appointment_schedule').setValue(STATUS_APPOINTMENT_SCHEDULE.PENDIENTE);
 
           if (hour !== '00:00') {
             this.formGroup.get('appointment_time').setValue(moment(this.dialogData.data.appointment_date).format('HH:mm'));
           }
-
         }
-
       }
-
-
-
-      // if (this.dialogData.fromWaitiningList) {
-      //   this.formGroup.get('name').setValue(this.dialogData.data.patient.name);
-      //   this.formGroup.get('last_name_f').setValue(this.dialogData.data.patient.last_name_f);
-      //   this.formGroup.get('last_name_m').setValue(this.dialogData.data.patient.last_name_m);
-      //   this.formGroup.get('who_recomend').setValue(this.dialogData.data.who_recomend);
-      //   this.formGroup.get('comments').setValue(this.dialogData.data.comments);
-      //   this.formGroup.get('procedure_type').setValue(this.dialogData.data.procedure_type.id);
-      //   this.selectProcedureType(this.dialogData.data.procedure_type.id);
-      //   if (this.procedures) {
-      //     this.formGroup.get('procedure').setValue(this.dialogData.data.procedure.id);
-      //   }
-      //   this.formGroup.get('appointment_type').setValue(this.dialogData.data.appointment_type);
-      //   this.formGroup.get('appointment_modality').setValue(this.dialogData.data.appointment_modality);
-      //   this.formGroup.get('status_appointment_schedule').setValue(STATUS_APPOINTMENT_SCHEDULE.PENDIENTE);
-      //   this.formGroup.get('patient_id').setValue(this.dialogData.data.patient.id);
-
-      //   this.formGroup.get('name').disable();
-      //   this.formGroup.get('last_name_f').disable();
-      //   this.formGroup.get('last_name_m').disable();
-      //   this.formGroup.get('status_appointment_schedule').disable();
-      // } else {
-      //   this.formGroup.get('who_recomend').setValue(this.dialogData.data.who_recomend);
-      //   this.formGroup.get('comments').setValue(this.dialogData.data.comments);
-      //   this.formGroup.get('procedure_type').setValue(this.dialogData.data.procedure_type_id);
-      //   this.selectProcedureType(this.dialogData.data.procedure_type_id);
-      //   if (this.procedures) {
-      //     this.formGroup.get('procedure').setValue(this.dialogData.data.procedure_id);
-      //   }
-      //   this.formGroup.get('appointment_type').setValue(this.dialogData.data.appointment_type);
-      //   this.formGroup.get('appointment_modality').setValue(this.dialogData.data.appointment_modality);
-      //   this.formGroup.get('status_appointment_schedule').setValue(this.dialogData.data.status_appointment_schedule);
-      //   this.formGroup.get('patient_id').setValue(this.dialogData.data.patient_id);
-      //   this.formGroup.get('appointment_date').setValue(this.dialogData.data.appointment_date);
-      //   this.formGroup.get('appointment_time').setValue(this.dialogData.data.appointment_time);
-      // }
 
     } else {
       // this.formGroup.get('status_appointment_schedule').disable();
@@ -213,7 +181,7 @@ export class AppointmentScheduleDialogComponent implements OnInit {
 
   isEdit() {
     if (this.dialogData.data) {
-      if (this.dialogData.fromWaitiningList) {
+      if (!this.dialogData.edit) {
         this.save();
       } else {
         this.update();
@@ -231,6 +199,8 @@ export class AppointmentScheduleDialogComponent implements OnInit {
       if (res.code === 200) {
         this.dialogRef.close();
         this.notyf.setSuccess();
+      } else if (res.code === 400) {
+        this.notyf.setWarningWithMessage(res.message);
       } else {
         this.notyf.setErrorWithMessage(res.message);
       }
@@ -257,31 +227,18 @@ export class AppointmentScheduleDialogComponent implements OnInit {
     );
   }
 
-  openSnackBar(msg, type) {
-    this._snackBar.openFromComponent(SnackbarComponent, {
-      data: {
-        message: msg,
-        type: type
-      },
-      duration: 5 * 1000,
-      horizontalPosition: 'right',
-      verticalPosition: 'bottom',
-      // panelClass: 'background-snackbar-white'
-    });
-
-    // this._snackBar.open('Message archived', 'Undo', {
-    //   duration: 3000,
-    //   horizontalPosition: 'center',
-    //   verticalPosition: 'top'
-    // });
-  }
-
   getProcedureTypes() {
     try {
       this.httpService.getAll(REQUEST.PROCEDURE_TYPES_LIST).subscribe((res: any) => {
         if (res.code === 200) {
           this.procedure_types = res.data;
-          console.log(this.procedure_types);
+          if (this.dialogData.data) {
+            // if (this.procedure_types.length > 0) {
+            //   console.log('this.dialogData.data.procedure_type_id', this.dialogData.data.procedure_type_id);
+            // }
+            this.isTherapy(this.dialogData.data.procedure_type_id);
+          }
+
         } else {
           this.notyf.setErrorWithMessage(res.message);
         }
@@ -462,13 +419,9 @@ export class AppointmentScheduleDialogComponent implements OnInit {
 
   isTherapy(id) {
     if (id && this.procedure_types) {
-
       const is_therapy = this.procedure_types.filter(
         element => element.id == id);
-
-      console.log(is_therapy[0].name === PROCEDURE_TYPE.TERAPIA);
       this.is_therapy = is_therapy[0].name === PROCEDURE_TYPE.TERAPIA;
-
     }
   }
 

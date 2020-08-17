@@ -10,5 +10,8 @@ export enum REQUEST {
     CONSULTING_ROOMS = 'pages/consultorios',
     CONSULTING_ROOMS_LIST = 'pages/consultorios/lista',
     WAITINING_LIST = 'pages/lista-espera',
-    APPOINTMENT_SCHEDULE = 'pages/agenda-citas'
+    APPOINTMENT_SCHEDULE = 'pages/agenda-citas',
+    APPOINTMENT_SCHEDULE_STATUS_UPDATE = 'pages/agenda/citas/actualizar-estatus',
+    COUNTRIES = 'pages/direcciones/paises',
+    STATES = 'pages/direcciones/estados'
 }

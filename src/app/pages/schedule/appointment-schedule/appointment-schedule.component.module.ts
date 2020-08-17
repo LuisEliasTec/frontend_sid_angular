@@ -10,7 +10,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSortModule } from '@angular/material/sort';
-import { MatPaginatorModule, MatSelectModule, MatGridListModule, MatSidenavModule, MatSlideToggleModule, MatDatepickerModule, MatButtonToggleModule } from '@angular/material';
+import { MatPaginatorModule, MatSelectModule, MatGridListModule, MatSidenavModule, MatSlideToggleModule, MatDatepickerModule, MatButtonToggleModule, MatBottomSheetModule, MatListModule, MatCheckboxModule } from '@angular/material';
 import { AppointmentScheduleComponent } from './appointment-schedule.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
@@ -23,17 +23,22 @@ import { AmazingTimePickerModule } from 'amazing-time-picker';
 import { registerLocaleData } from '@angular/common';
 import localeEs from '@angular/common/locales/es';
 import { ContextMenuModule } from 'ngx-contextmenu';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { AppointmentScheduleBottomSheetComponent } from './appointment-schedule-bottom-sheet/appointment-schedule-bottom-sheet.component';
+import { MatMomentDateModule, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from "@angular/material-moment-adapter";
 
 registerLocaleData(localeEs);
 
 @NgModule({
     declarations: [
         AppointmentScheduleComponent,
-        AppointmentScheduleDialogComponent
+        AppointmentScheduleDialogComponent,
+        AppointmentScheduleBottomSheetComponent
     ],
     entryComponents: [
         AppointmentScheduleComponent,
-        AppointmentScheduleDialogComponent
+        AppointmentScheduleDialogComponent,
+        AppointmentScheduleBottomSheetComponent
     ],
     imports: [
         CommonModule,
@@ -68,9 +73,16 @@ registerLocaleData(localeEs);
         ContextMenuModule.forRoot(
             { useBootstrap4: true }
         ),
-        MatButtonToggleModule
+        MatButtonToggleModule,
+        DragDropModule,
+        MatBottomSheetModule,
+        MatListModule,
+        MatMomentDateModule,
+        MatCheckboxModule
     ],
-    providers: [],
+    providers: [
+        { provide: MAT_MOMENT_DATE_ADAPTER_OPTIONS, useValue: { useUtc: false } }
+    ],
     bootstrap: []
 })
 export class AppointmentScheduleModule { }

@@ -39,6 +39,13 @@ export class PatientsDialogComponent implements OnInit {
     { value: MARITAL_STATUS.VIUDO }
   ];
 
+  // Arrays
+  countries = [];
+  states = [];
+
+  // Booleans
+  is_mexico = null;
+
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
     private httpService: CrudService,
@@ -59,10 +66,17 @@ export class PatientsDialogComponent implements OnInit {
       optional_email: new FormControl(null, [Validators.maxLength(255)]),
       marital_status: new FormControl(null, [Validators.required]),
       number_children: new FormControl(null, [Validators.required]),
-      address_id: new FormControl(null, []),
-      zip_code: new FormControl(null, [])
+      // address_id: new FormControl(null, []),
+      // zip_code: new FormControl(null, [])
+      
+      country: new FormControl(null, [Validators.required]),
+      state: new FormControl(null, [Validators.required]),
+      city: new FormControl(null, [Validators.required]),
+      address: new FormControl(null, [Validators.required]),
+      is_mexico: new FormControl(null, [])
     });
     this.dialog_title = dialogData.title;
+    this.getCountries();
   }
 
   ngOnInit() {
@@ -135,6 +149,44 @@ export class PatientsDialogComponent implements OnInit {
         if (res.code === 200) {
           console.log(res.data);
           this.openSnackBar('Acción exitosa.', 'success');
+        } else {
+          this.openSnackBar('Ocurrió un error.', 'error');
+        }
+      },
+      error => {
+        this.openSnackBar('Ocurrió un error.', 'error');
+      }
+    );
+  }
+
+  getCountries() {
+    this.httpService.getAll(REQUEST.COUNTRIES).subscribe(
+      (res: any) => {
+        if (res.code === 200) {
+          console.log(res.data);
+          this.countries = res.data;
+          this.openSnackBar('Acción exitosa.', 'success');
+        } else {
+          this.openSnackBar('Ocurrió un error.', 'error');
+        }
+      },
+      error => {
+        this.openSnackBar('Ocurrió un error.', 'error');
+      }
+    );
+  }
+
+  getStatesByCountry(event) {
+    this.is_mexico = event.value.name === 'Mexico' ? true : false;
+    this.formGroup.get('is_mexico').setValue(this.is_mexico);
+    this.httpService.getAll(REQUEST.STATES, event.value).subscribe(
+      (res: any) => {
+        if (res.code === 200) {
+          if (res.data.length > 0) {
+            this.states = res.data;
+          } else {
+            this.formGroup.get('state').reset();
+          }
         } else {
           this.openSnackBar('Ocurrió un error.', 'error');
         }

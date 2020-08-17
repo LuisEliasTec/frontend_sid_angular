@@ -1,4 +1,8 @@
+import * as moment from 'moment';
+
 export class TimeFormat {
+
+  moment = moment;
 
   getTime(date: any) {
     let minutes = '' + new Date(date).getMinutes();
@@ -41,11 +45,12 @@ export class TimeFormat {
     return '' + startSplit[0] + ':' + startSplit[1];
   }
 
-  setDate(date: Date, time: string) {
+  setDate(date: any, time: string) {
+    const new_date = new Date(date);
     const startSplit = time.split(':');
-    date.setHours(parseInt(startSplit[0], 10));
-    date.setMinutes(parseInt(startSplit[1], 10));
-    return date;
+    new_date.setHours(parseInt(startSplit[0], 10));
+    new_date.setMinutes(parseInt(startSplit[1], 10));    
+    return new_date;
   }
 
   setActualDate(time: string) {

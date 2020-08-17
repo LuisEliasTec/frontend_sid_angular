@@ -1,4 +1,5 @@
 <mat-sidenav-container class="">
+
   <mat-sidenav #sidenav mode="over" closed class="sidenav-waitining-list">
 
     <div class="container">
@@ -6,10 +7,15 @@
       <h1>Lista de espera</h1>
       <mat-divider></mat-divider>
 
-      <div class="py-3">
-        <button mat-raised-button class="btn-add" (click)="waitiningListCreate()" matTooltip="Agregar nuevo registro">
-          <mat-icon aria-hidden="true">add</mat-icon> Agregar
-        </button>
+      <div class="row py-3">
+        <div class="col-md-12">
+          <button mat-raised-button class="btn-add" (click)="waitiningListCreate()" matTooltip="Agregar nuevo registro">
+            <mat-icon aria-hidden="true">add</mat-icon> Agregar
+          </button>
+          <button mat-raised-button class="float-right" (click)="sidenav.toggle()" matTooltip="Cerrar lista de espera">
+            <mat-icon aria-hidden="true">add</mat-icon> Cerrar
+          </button>
+        </div>
       </div>
 
       <div class="row">
@@ -21,108 +27,101 @@
         </div>
       </div>
 
-      <div class="table-container">
-        <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" matSort>
+      <div class="row container">
+        <div class="col-md-12 col-12 col-sm-12">
+          <div class="table-container">
+            <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8" matSort>
 
-          <ng-container matColumnDef="name">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
-            <td mat-cell *matCellDef="let row"> {{row.patient.name}} </td>
-          </ng-container>
-          <ng-container matColumnDef="last_name_f">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
-            <td mat-cell *matCellDef="let row"> {{row.patient.last_name_f}} </td>
-          </ng-container>
-          <ng-container matColumnDef="last_name_m">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
-            <td mat-cell *matCellDef="let row"> {{row.patient.last_name_m}} </td>
-          </ng-container>
-          <ng-container matColumnDef="procedure_type">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento </th>
-            <td mat-cell *matCellDef="let row"> {{row.procedure_type ? row.procedure_type.name : '--'}} </td>
-          </ng-container>
-          <ng-container matColumnDef="procedure">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
-            <td mat-cell *matCellDef="let row"> {{row.procedure ? row.procedure.name : '--'}} </td>
-          </ng-container>
-          <ng-container matColumnDef="appointment_type">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
-            <td mat-cell *matCellDef="let row"> {{row.appointment_type}} </td>
-          </ng-container>
-          <ng-container matColumnDef="appointment_modality">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
-            <td mat-cell *matCellDef="let row"> {{row.appointment_modality}} </td>
-          </ng-container>
-          <ng-container matColumnDef="status_waitining_list">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
-            <td mat-cell *matCellDef="let row"> {{row.status_waitining_list}} </td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
-            <td mat-cell *matCellDef="let row">
-              <!-- <button mat-mini-fab color="basic" (click)="waitiningListEdit(row)" matTooltip="Editar">
-                <mat-icon>edit</mat-icon>
-              </button>
-              &nbsp;
-              <button mat-mini-fab color="basic" (click)="deleteWaitiningList(row.id)" matTooltip="Eliminar">
-                <mat-icon>delete</mat-icon>
-              </button>
-              &nbsp;
-              <button mat-mini-fab color="basic" (click)="appointmentCreateByWaitiningList(row)"
-                matTooltip="Agendar cita">
-                <mat-icon>filter_list</mat-icon>
-              </button> -->
+              <ng-container matColumnDef="name">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+                <td mat-cell *matCellDef="let row"> {{row.patient.name}} </td>
+              </ng-container>
+              <ng-container matColumnDef="last_name_f">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
+                <td mat-cell *matCellDef="let row"> {{row.patient.last_name_f}} </td>
+              </ng-container>
+              <ng-container matColumnDef="last_name_m">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
+                <td mat-cell *matCellDef="let row"> {{row.patient.last_name_m}} </td>
+              </ng-container>
+              <ng-container matColumnDef="procedure_type">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento
+                </th>
+                <td mat-cell *matCellDef="let row"> {{row.procedure_type ? row.procedure_type.name : '--'}} </td>
+              </ng-container>
+              <ng-container matColumnDef="procedure">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
+                <td mat-cell *matCellDef="let row"> {{row.procedure ? row.procedure.name : '--'}} </td>
+              </ng-container>
+              <ng-container matColumnDef="appointment_type">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
+                <td mat-cell *matCellDef="let row"> {{row.appointment_type}} </td>
+              </ng-container>
+              <ng-container matColumnDef="appointment_modality">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
+                <td mat-cell *matCellDef="let row"> {{row.appointment_modality}} </td>
+              </ng-container>
+              <ng-container matColumnDef="status_waitining_list">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
+                <td mat-cell *matCellDef="let row"> {{row.status_waitining_list}} </td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th class="th-principal-color" mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+                <td mat-cell *matCellDef="let row">
+                  <mat-icon class="btn-action-edit" (click)="waitiningListEdit(row)" matTooltip="Editar">edit</mat-icon>
+                  <mat-icon class="btn-action-delete" (click)="deleteWaitiningList(row)" matTooltip="Eliminar">delete
+                  </mat-icon>
+                  <mat-icon class="btn-action-appointment" (click)="appointmentCreateByWaitiningList(row)"
+                    matTooltip="Agendar cita">calendar_today</mat-icon>
+                </td>
+              </ng-container>
 
-              <mat-icon class="btn-action-edit" (click)="waitiningListEdit(row)" matTooltip="Editar">edit</mat-icon>
-              <mat-icon class="btn-action-delete" (click)="deleteWaitiningList(row)" matTooltip="Eliminar">delete
-              </mat-icon>
-              <mat-icon class="btn-action-appointment" (click)="appointmentCreateByWaitiningList(row)"
-                matTooltip="Agendar cita">calendar_today</mat-icon>
-            </td>
-          </ng-container>
+              <ng-container matColumnDef="expandedDetail">
+                <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length"
+                  class="multiplerow-bg-color">
+                  <div class="example-element-detail"
+                    [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
 
-          <ng-container matColumnDef="expandedDetail">
-            <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumns.length" class="multiplerow-bg-color">
-              <div class="example-element-detail"
-                [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                    <div class="table-multiplerow-width">
+                      <table class="table">
+                        <thead>
+                          <tr class="th-multiplerow-customized">
+                            <th class="th-multiplerow">Teléfono</th>
+                            <th class="th-multiplerow">Teléfono opcional</th>
+                            <th class="th-multiplerow">Email</th>
+                            <th class="th-multiplerow">Email opcional</th>
+                            <th class="th-multiplerow">Comentarios</th>
+                            <th class="th-multiplerow">¿Quién recomienda?</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>{{ element.patient.phone_number }}</td>
+                            <td>{{ element.patient.optional_phone_number }}</td>
+                            <td>{{ element.patient.email }}</td>
+                            <td>{{ element.patient.optional_email }}</td>
+                            <td>{{ element.comments }}</td>
+                            <td>{{ element.who_recomend }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
 
-                <div class="">
-                  <table class="table">
-                    <thead>
-                      <tr class="th-multiplerow-customized">
-                        <th class="th-multiplerow">Teléfono</th>
-                        <th class="th-multiplerow">Teléfono opcional</th>
-                        <th class="th-multiplerow">Email</th>
-                        <th class="th-multiplerow">Email opcional</th>
-                        <th class="th-multiplerow">Comentarios</th>
-                        <th class="th-multiplerow">¿Quién recomienda?</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>{{ element.patient.phone_number }}</td>
-                        <td>{{ element.patient.optional_phone_number }}</td>
-                        <td>{{ element.patient.email }}</td>
-                        <td>{{ element.patient.optional_email }}</td>
-                        <td>{{ element.comments }}</td>
-                        <td>{{ element.who_recomend }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                  </div>
+                </td>
+              </ng-container>
 
-              </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="example-element-row"
-            [class.example-expanded-row]="expandedElement === element"
-            (click)="expandedElement = expandedElement === element ? null : element">
-          </tr>
-          <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
-        </table>
-
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let element; columns: displayedColumns;" class="example-element-row"
+                [class.example-expanded-row]="expandedElement === element"
+                (click)="expandedElement = expandedElement === element ? null : element">
+              </tr>
+              <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row"></tr>
+            </table>
+          </div>
+        </div>
       </div>
+
       <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
 
     </div>
@@ -195,6 +194,8 @@
           <button mat-stroked-button (click)="sidenav.toggle()">Lista de espera</button>
           <button mat-stroked-button (click)="appointmentCreate()">Agendar</button>
           <button mat-stroked-button (click)="notyfTest()">Notyf</button>
+          <input type="color" (change)="refresh.next()" />
+
           <!-- <mat-button-toggle-group name="fontStyle" aria-label="Font Style" [value]="_activeValue">
             <mat-button-toggle value="mes" (change)="onChange($event)" (click)="sidenav.toggle()">Lista de espera
             </mat-button-toggle>
@@ -202,7 +203,7 @@
             </mat-button-toggle>
           </mat-button-toggle-group> -->
 
-          &nbsp;
+          <!-- &nbsp; -->
 
           <!-- <mat-button-toggle-group name="fontStyle" aria-label="Font Style">
             <mat-button-toggle value="anterior" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate"
@@ -339,4 +340,5 @@
     </div>
 
   </mat-sidenav-content>
+
 </mat-sidenav-container>

@@ -1,14 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
 
 // @import '@angular/material/prebuilt-themes/pink-bluegrey.css';
-@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
 
 /* angular-cli file: src/styles.css */
 @import "../node_modules/angular-calendar/css/angular-calendar.css";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+  height: 100%;
+}
 
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+// row
+
+.row {
+  padding: 20px 0;
+  display: flex;
+  align-items: center;
+}
 
 // Snackbar Angular Material
 
@@ -51,7 +65,9 @@ table {
 
 // Action buttons table
 
-.btn-action-edit, .btn-action-delete, .btn-action-appointment {
+.btn-action-edit,
+.btn-action-delete,
+.btn-action-appointment {
   font-size: 20px;
   cursor: pointer;
 }
@@ -73,7 +89,7 @@ table {
 }
 
 .btn-add:hover {
-  background-color: #8BC34A;
+  background-color: #8bc34a;
   color: white;
   transition-duration: 0.1s, 0.1s;
 }
@@ -119,7 +135,14 @@ table {
 @media (max-width: 600px) {
   // Making the modal fullscreen in mobiles
   .sidenav-waitining-list {
-    width: 100vw !important;
+    // width: 100vw !important;
+    width: 100%;
     height: 100vh !important;
   }
+}
+
+// Buttons
+
+.float-right {
+  float: right;
 }

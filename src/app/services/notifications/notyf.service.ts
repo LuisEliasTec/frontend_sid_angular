@@ -60,6 +60,21 @@ export class NotyfService {
         });
     }
 
+    setWarningWithMessage(string: string) {
+        this.notyf.open({
+            type: 'warning',
+            message: string,
+            background: '#FFC400',
+            icon: {
+                className: 'material-icons',
+                tagName: 'i',
+                text: 'warning',
+                color: 'white'
+            },
+            className: 'notyf-text-color'
+        });
+    }
+
     setError() {
         this.notyf.open({
             type: 'error',

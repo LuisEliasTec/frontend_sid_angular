@@ -37,7 +37,9 @@ import { ClassGetter } from '@angular/compiler/src/output/output_ast';
 import * as moment from 'moment';
 import { TimeFormat } from 'src/app/utils/timeFormat';
 import { elementEnd } from '@angular/core/src/render3';
-import { PROCEDURE_TYPE } from 'src/app/utils/enums/appointment_parameters.enum';
+import { PROCEDURE_TYPE, STATUS_APPOINTMENT_SCHEDULE } from 'src/app/utils/enums/appointment_parameters.enum';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { AppointmentScheduleBottomSheetComponent } from './appointment-schedule-bottom-sheet/appointment-schedule-bottom-sheet.component';
 
 const colors: any = {
   red: {
@@ -52,6 +54,10 @@ const colors: any = {
     primary: '#e3bc08',
     secondary: '#FDF1BA',
   },
+  green: {
+    primary: '#67b140',
+    secondary: '#b3d479'
+  }
 };
 
 @Component({
@@ -91,19 +97,32 @@ export class AppointmentScheduleComponent implements OnInit {
   actions: CalendarEventAction[] = [
     {
       label: '<i class="fas fa-fw fa-pencil-alt"></i>',
-      a11yLabel: 'Edit',
+      a11yLabel: 'Editar',
       onClick: ({ event }: { event: CalendarEvent }): void => {
         this.appointmentScheduleEdit(event);
       },
     },
     {
       label: '<i class="fas fa-fw fa-trash-alt"></i>',
-      a11yLabel: 'Delete',
+      a11yLabel: 'Eliminar',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter((iEvent) => iEvent !== event);
+        // this.events = this.events.filter((iEvent) => iEvent !== event);
         this.deleteAppointmentSchedule(event.id);
       },
+    }, {
+      label: '<i class="fas fa-fw fa-trash-alt"></i>',
+      a11yLabel: 'Cambiar estatus',
+      onClick: ({ event }: { event: CalendarEvent }): void => {
+        this.openBottomSheet(event);
+      },
     },
+    // {
+    //   label: '<i class="fa fa-circle"></i>',
+    //   cssClass: 'appointment-status-color-attended',
+    //   a11yLabel: 'Estatus de la cita',
+    //   onClick: ({ event }: { event: CalendarEvent }): void => {
+    //   },
+    // },
   ];
 
   refresh: Subject<any> = new Subject();
@@ -162,7 +181,8 @@ export class AppointmentScheduleComponent implements OnInit {
     public dialog: MatDialog,
     private httpService: CrudService,
     private _snackBar: MatSnackBar,
-    private notyf: NotyfService
+    private notyf: NotyfService,
+    private _bottomSheet: MatBottomSheet
   ) {
     this.getWaitiningList();
     this.getAppointmentSchedules();
@@ -187,18 +207,38 @@ export class AppointmentScheduleComponent implements OnInit {
     try {
       this.httpService.getAll(REQUEST.APPOINTMENT_SCHEDULE).subscribe((res: any) => {
         if (res.code === 200) {
-          console.log(res.data);
-
           if (res.data.length > 0) {
+            let appointment_status_color = '';
             let appointment_schedules_mapped = res.data.map(element => {
-              const resultDate = new TimeFormat().setDate(new Date(element.appointment_date), element.appointment_time);
+              const resultDate = new TimeFormat().setDate(moment(element.appointment_date).format(), element.appointment_time);
               const is_therapy = element.procedure_type.name !== PROCEDURE_TYPE.TERAPIA ? ' | ' + element.appointment_type + ' | ' : ' | ';
+
+              switch (element.status_appointment_schedule) {
+                case STATUS_APPOINTMENT_SCHEDULE.ASISTIO:
+                  appointment_status_color = colors.green;
+                  break;
+
+                case STATUS_APPOINTMENT_SCHEDULE.NO_ASISTIO:
+                  appointment_status_color = colors.yellow;
+                  break
+
+                case STATUS_APPOINTMENT_SCHEDULE.CANCELO:
+                  appointment_status_color = colors.red;
+                  break;
+
+                case STATUS_APPOINTMENT_SCHEDULE.PENDIENTE:
+                  appointment_status_color = colors.blue;
+                  break;
+
+                default:
+                  break;
+              }
 
               return {
                 start: resultDate,
                 title: element.patient.name + ' ' + element.patient.last_name_f + ' ' + element.patient.last_name_m + ' | ' + element.procedure.name +
                   is_therapy + moment(element.appointment_time, 'h:mm a').format('h:mm a') + ' | ' + element.status_appointment_schedule,
-                color: colors.red,
+                color: appointment_status_color,
                 actions: this.actions,
                 allDay: false,
                 resizable: {
@@ -215,7 +255,6 @@ export class AppointmentScheduleComponent implements OnInit {
               };
 
             });
-
             this.events = appointment_schedules_mapped;
             this.refresh.next();
           }
@@ -254,7 +293,6 @@ export class AppointmentScheduleComponent implements OnInit {
   waitiningListEdit(event) {
     this.httpService.getBy(REQUEST.WAITINING_LIST, event.id).subscribe((res: any) => {
       if (res.code === 200) {
-        // const result = res.data;
         this.openWaitiningListDialog(true, 'Editar lista de espera', REQUEST.WAITINING_LIST, res.data);
       } else {
         this.notyf.setErrorWithMessage(res.message);
@@ -293,20 +331,25 @@ export class AppointmentScheduleComponent implements OnInit {
   }
 
   appointmentCreateByWaitiningList(event) {
-    this.httpService.getBy(REQUEST.WAITINING_LIST, event.id).subscribe((res: any) => {
-      if (res.code === 200) {
-        const result = res.data;
-        this.openAppointmentDialog(false, 'Agendar cita', REQUEST.APPOINTMENT_SCHEDULE, true, result);
-      } else {
-        this.notyf.setErrorWithMessage(res.message)
-      }
-    }, err => {
-      this.notyf.setError();
-    });
+    console.log('agendar desde lista de espera', event);
+    // this.httpService.getBy(REQUEST.WAITINING_LIST, event.id).subscribe((res: any) => {
+    //   if (res.code === 200) {
+    //     const result = res.data;
+    //     console.log('resultado del show', result);
+
+    //     this.openAppointmentDialog(false, 'Agendar cita', REQUEST.APPOINTMENT_SCHEDULE, true, result);
+    //   } else {
+    //     this.notyf.setErrorWithMessage(res.message)
+    //   }
+    // }, err => {
+    //   this.notyf.setError();
+    // });
+
+    this.openAppointmentDialog(false, 'Agendar cita', REQUEST.APPOINTMENT_SCHEDULE, true, event);
+
   }
 
   appointmentScheduleEdit(event) {
-    console.log(event);
     this.httpService.getBy(REQUEST.APPOINTMENT_SCHEDULE, event.id).subscribe((res: any) => {
       if (res.code === 200) {
         // const result = res.data;
@@ -362,7 +405,6 @@ export class AppointmentScheduleComponent implements OnInit {
       maxWidth: '100vw',
       maxHeight: '100vh',
       width: '750px',
-      // height: '85vh',
       height: 'auto',
       disableClose: true,
       hasBackdrop: true,
@@ -376,6 +418,7 @@ export class AppointmentScheduleComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((res: any) => {
       this.getAppointmentSchedules();
+      this.getWaitiningList();
     });
   }
 
@@ -447,7 +490,6 @@ export class AppointmentScheduleComponent implements OnInit {
   handleEvent(action: string, event: CalendarEvent): void {
     this.modalData = { event, action };
     // this.modal.open(this.modalContent, { size: 'lg' });
-    console.log(this.modalData);
     this.openAppointmentDialog(true, 'Cita', '', false, this.modalContent,);
   }
 
@@ -482,7 +524,6 @@ export class AppointmentScheduleComponent implements OnInit {
   }
 
   addEventContextMenu(event) {
-    console.log(event);
     const date_object = {
       appointment_date: event
     };
@@ -503,6 +544,36 @@ export class AppointmentScheduleComponent implements OnInit {
     this.notyf.setInfo('Test info');
     this.notyf.setWarning('Warning test');
     this.notyf.setError();
+  }
+
+  openBottomSheet(event) {
+    this._bottomSheet.open(AppointmentScheduleBottomSheetComponent, event);
+    this._bottomSheet._openedBottomSheetRef.afterDismissed().subscribe((data) => {
+      if (data) {
+        this.updateStatusAppointment(data);
+        this.getAppointmentSchedules();
+      }
+    });
+  }
+
+  updateStatusAppointment(data: any) {
+    if (data) {
+      this.httpService.create(REQUEST.APPOINTMENT_SCHEDULE_STATUS_UPDATE, data).subscribe(
+        (res: any) => {
+          if (res.code === 200) {
+            this.getAppointmentSchedules();
+            this.notyf.setSuccess();
+          } else {
+            this.notyf.setErrorWithMessage(res.message);
+          }
+        },
+        error => {
+          this.notyf.setError();
+        }
+      );
+    } else {
+      return;
+    }
   }
 
 }
