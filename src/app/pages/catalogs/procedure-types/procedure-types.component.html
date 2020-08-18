@@ -1,0 +1,50 @@
+<mat-card>
+
+  <h1>Tipos de procedimiento</h1>
+  <mat-divider></mat-divider>
+
+  <div class="py-3">
+    <button mat-raised-button color="primary" (click)="create()" matTooltip="Agregar nuevo registro">Agregar
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+  </div>
+
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Buscar">
+  </mat-form-field>
+
+  <div class="mat-elevation-z8">
+
+    <div class="mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let row"> {{row.name}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-raised-button (click)="edit(row)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+            </button>
+            &nbsp;
+            <button mat-raised-button (click)="delete(row.id)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+
+  </div>
+
+</mat-card>

@@ -1,0 +1,94 @@
+<mat-card>
+
+  <h1>Lista de espera</h1>
+  <mat-divider></mat-divider>
+
+  <div class="py-3">
+    <button mat-raised-button color="primary" (click)="create()" matTooltip="Agregar nuevo registro">Agregar
+      <mat-icon aria-hidden="true">add</mat-icon>
+    </button>
+  </div>
+
+  <div class="col-md-4">
+    <mat-form-field>
+      <mat-label>Buscar</mat-label>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="">
+    </mat-form-field>
+  </div>
+
+  <div class="mat-elevation-z8">
+
+    <div class="table-container mat-elevation-z8">
+      <table mat-table [dataSource]="dataSource" matSort>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </th>
+          <td mat-cell *matCellDef="let row"> {{row.patient.name}} </td>
+        </ng-container>
+        <ng-container matColumnDef="last_name_f">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> A. paterno </th>
+          <td mat-cell *matCellDef="let row"> {{row.patient.last_name_f}} </td>
+        </ng-container>
+        <ng-container matColumnDef="last_name_m">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> A. materno </th>
+          <td mat-cell *matCellDef="let row"> {{row.patient.last_name_m}} </td>
+        </ng-container>
+        <ng-container matColumnDef="phone_number">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Teléfono </th>
+          <td mat-cell *matCellDef="let row"> {{row.patient.phone_number}} </td>
+        </ng-container>
+        <ng-container matColumnDef="email">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Correo electrónico </th>
+          <td mat-cell *matCellDef="let row"> {{row.patient.email}} </td>
+        </ng-container>
+        <ng-container matColumnDef="procedure_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de procedimiento </th>
+          <td mat-cell *matCellDef="let row"> {{row.procedure_type ? row.procedure_type.name : '--'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="procedure">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Procedimiento </th>
+          <td mat-cell *matCellDef="let row"> {{row.procedure ? row.procedure.name : '--'}} </td>
+        </ng-container>
+        <ng-container matColumnDef="appointment_type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Tipo de cita </th>
+          <td mat-cell *matCellDef="let row"> {{row.appointment_type}} </td>
+        </ng-container>
+        <ng-container matColumnDef="appointment_modality">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Modalidad </th>
+          <td mat-cell *matCellDef="let row"> {{row.appointment_modality}} </td>
+        </ng-container>
+        <ng-container matColumnDef="status_waitining_list">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Estatus </th>
+          <td mat-cell *matCellDef="let row"> {{row.status_waitining_list}} </td>
+        </ng-container>
+        <ng-container matColumnDef="comments">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Comentarios </th>
+          <td mat-cell *matCellDef="let row"> {{row.comments}} </td>
+        </ng-container>
+        <ng-container matColumnDef="who_recomend">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ¿Quién recomienda? </th>
+          <td mat-cell *matCellDef="let row"> {{row.who_recomend}} </td>
+        </ng-container>
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Acciones</th>
+          <td mat-cell *matCellDef="let row">
+            <button mat-raised-button (click)="edit(row)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">edit</mat-icon>
+            </button>
+            &nbsp;
+            <button mat-raised-button (click)="delete(row.id)">
+              <mat-icon aria-hidden="false" aria-label="Example home icon">delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+
+  </div>
+
+</mat-card>

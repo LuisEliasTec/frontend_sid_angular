@@ -1,28 +1,21 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CrudService } from 'src/app/services/services.index';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { MatTableDataSource, MatSort, MatDialog, MatSnackBar, MatPaginator } from '@angular/material';
 import { ProcedureDialogComponent } from './procedure-dialog/procedure-dialog/procedure-dialog.component';
 import swal from 'sweetalert2';
 import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
+import { REQUEST } from 'src/app/utils/enums/request.enum';
 
 @Component({
   selector: 'app-procedures',
   templateUrl: './procedures.component.html',
-  styleUrls: ['./procedures.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ]
+  styleUrls: ['./procedures.component.scss']
 })
 export class ProceduresComponent implements OnInit, AfterViewInit {
 
   // MatTable
-  displayedColumns = ['description', 'actions'];
+  displayedColumns = ['name', 'description', 'price', 'procedure_type', 'actions'];
   dataSource = new MatTableDataSource();
 
   @ViewChild(MatSort) sort: MatSort;
@@ -46,17 +39,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
   }
 
-  // applyFilter(event: Event) {
-  //   const filterValue = (event.target as HTMLInputElement).value;
-  //   this.dataSource.filter = filterValue.trim().toLowerCase();
-
-  //   if (this.dataSource.paginator) {
-  //     this.dataSource.paginator.firstPage();
-  //   }
-  // }
-
   applyFilter(filterValue: string) {
-    console.log(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     // if (this.dataSource.paginator) {
@@ -66,9 +49,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
 
   getProcedures(offset = 0, pagesize?: number) {
     try {
-      // this.filtros.offset = (offset > 0) ? offset - 1 : offset;
-      this.httpService.getAll('pages/procedimientos').subscribe((res: any) => {
-        // this.resultsLength = res.data.total;
+      this.httpService.getAll(REQUEST.PROCEDURES).subscribe((res: any) => {
         if (res.code === 200) {
           this.dataSource.data = res.data;
         } else {
@@ -83,15 +64,14 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   }
 
   create() {
-    this.openDialog(false, 'Crear nuevo procedimiento');
+    this.openDialog(false, 'Crear nuevo procedimiento', REQUEST.PROCEDURES);
   }
 
   edit(event) {
-    this.httpService.getBy('pages/procedimientos', event.id).subscribe((res: any) => {
-      // this.resultsLength = res.data.total;
+    this.httpService.getBy(REQUEST.PROCEDURES, event.id).subscribe((res: any) => {
       if (res.code === 200) {
         const result = res.data;
-        this.openDialog(true, 'Editar procedimiento', result);
+        this.openDialog(true, 'Editar procedimiento', REQUEST.PROCEDURES, result);
       } else {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
@@ -103,7 +83,7 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
   delete(id) {
     swal(Utils.getConfirm()).then(t => {
       if (t.value) {
-        this.httpService.delete('pages/procedimientos', id).subscribe(
+        this.httpService.delete(REQUEST.PROCEDURES, id).subscribe(
           (res: any) => {
             if (res.code === 200) {
               this.getProcedures();
@@ -120,12 +100,14 @@ export class ProceduresComponent implements OnInit, AfterViewInit {
     }).catch();
   }
 
-  openDialog(edit: boolean, title: string, data?: any) {
+  openDialog(edit: boolean, title: string, path: any, data?: any) {
     const dialogRef = this.dialog.open(ProcedureDialogComponent, {
+      // width: '40%',
       data: {
         edit: edit,
         data: data,
-        title: title
+        title: title,
+        path: path
       }
     });
     dialogRef.afterClosed().subscribe((res: any) => {

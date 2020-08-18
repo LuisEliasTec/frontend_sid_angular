@@ -1,17 +1,53 @@
 <h2 mat-dialog-title>{{ dialog_title }}</h2>
 
-<form class="example-form" [formGroup]="form_group" (ngSubmit)="isEdit()">
+<form class="example-form" [formGroup]="formGroup" (ngSubmit)="isEdit()">
   <mat-dialog-content>
 
-    <mat-form-field class="example-full-width">
-      <mat-label>Procedimiento:</mat-label>
-      <input matInput formControlName="description" placeholder="Ex. Pizza">
-    </mat-form-field>
+    <div class="row">
+      <div class="col-md-6">
+        <mat-form-field>
+          <mat-label>Nombre</mat-label>
+          <input matInput formControlName="name" placeholder="">
+        </mat-form-field>
+      </div>
+      <div class="col-md-6">
+        <mat-form-field>
+          <mat-label>Tipo de procedimiento</mat-label>
+          <mat-select formControlName="procedure_type" name="procedure_type" (selectionChange)="isTherapy($event)">
+            <mat-option *ngFor="let item of procedure_types" [value]="item.id">
+              {{item.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-md-3">
+        <mat-form-field>
+          <mat-label>Precio</mat-label>
+          <input matInput type="number" formControlName="price" class="example-right-align">
+          <span matPrefix>$&nbsp;</span>
+        </mat-form-field>
+      </div>
+      <div class="col-md-8">
+        <mat-form-field>
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" placeholder=""></textarea>
+        </mat-form-field>
+      </div>
+      <div class="col-md-8" *ngIf="is_therapy">
+        <mat-form-field>
+          <mat-label>Consultorios</mat-label>
+          <mat-select formControlName="consulting_room" multiple>
+            <mat-option *ngFor="let item of consulting_rooms" [value]="item.id">{{item.name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+    </div>
 
   </mat-dialog-content>
 
   <mat-dialog-actions>
-    <button mat-button type="submit">Guardar</button>
+    <button mat-button type="submit" [disabled]="!formGroup.valid">Guardar</button>
     <button mat-button mat-dialog-close>Cancelar</button>
   </mat-dialog-actions>
 </form>
