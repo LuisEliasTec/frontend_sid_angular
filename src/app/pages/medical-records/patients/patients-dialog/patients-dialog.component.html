@@ -340,8 +340,8 @@
           <div class="col-md-3">
             <mat-form-field>
               <mat-label>País</mat-label>
-              <mat-select formControlName="country" (selectionChange)="getStatesByCountry($event)">
-                <mat-option *ngFor="let item of countries" [value]="item">
+              <mat-select formControlName="country" (selectionChange)="getStatesByCountry($event.value); resetStateForm();">
+                <mat-option *ngFor="let item of countries" [value]="item.id">
                   {{item.name}}
                 </mat-option>
               </mat-select>
@@ -352,7 +352,7 @@
             <mat-form-field>
               <mat-label>Estado</mat-label>
               <mat-select formControlName="state">
-                <mat-option *ngFor="let item of states" [value]="item">
+                <mat-option *ngFor="let item of states" [value]="item.id">
                   {{item.name}}
                 </mat-option>
               </mat-select>

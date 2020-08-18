@@ -7,6 +7,7 @@ import { Utils } from 'src/app/utils/utils';
 import { SnackbarComponent } from 'src/app/shared/snackbar/snackbar.component';
 import { REQUEST } from "src/app/utils/enums/request.enum";
 import { PatientsDialogComponent } from './patients-dialog/patients-dialog.component';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-patients',
@@ -17,8 +18,9 @@ export class PatientsComponent implements OnInit {
 
   // MatTable
   displayedColumns = ["name", "last_name_f", "last_name_m", "birth_date", "age", "gender", "phone_number", "email",
-    "marital_status", "number_children", "zip_code"];
+    "marital_status", "number_children", "actions"];
   dataSource = new MatTableDataSource();
+  moment = moment;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -51,7 +53,6 @@ export class PatientsComponent implements OnInit {
   // }
 
   applyFilter(filterValue: string) {
-    console.log(filterValue);
     this.dataSource.filter = filterValue.trim().toLowerCase();
 
     // if (this.dataSource.paginator) {
@@ -66,6 +67,8 @@ export class PatientsComponent implements OnInit {
         // this.resultsLength = res.data.total;
         if (res.code === 200) {
           this.dataSource.data = res.data;
+          console.log(res.data);
+          
         } else {
           this.openSnackBar('Ocurrió un error.', 'success');
         }

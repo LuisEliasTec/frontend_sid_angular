@@ -44,7 +44,7 @@ export class PatientsDialogComponent implements OnInit {
   states = [];
 
   // Booleans
-  is_mexico = null;
+  is_mexico: boolean;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public dialogData: any,
@@ -52,7 +52,6 @@ export class PatientsDialogComponent implements OnInit {
     public dialogRef: MatDialogRef<PatientsDialogComponent>,
     private _snackBar: MatSnackBar
   ) {
-    console.log(dialogData);
     this.formGroup = new FormGroup({
       name: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
       last_name_f: new FormControl(null, [Validators.required, Validators.maxLength(255)]),
@@ -68,7 +67,7 @@ export class PatientsDialogComponent implements OnInit {
       number_children: new FormControl(null, [Validators.required]),
       // address_id: new FormControl(null, []),
       // zip_code: new FormControl(null, [])
-      
+
       country: new FormControl(null, [Validators.required]),
       state: new FormControl(null, [Validators.required]),
       city: new FormControl(null, [Validators.required]),
@@ -80,9 +79,40 @@ export class PatientsDialogComponent implements OnInit {
   }
 
   ngOnInit() {
-    // if (this.dialogData.data) {
-    //   this.formGroup.get('description').setValue(this.dialogData.data.description);
-    // }
+    if (this.dialogData.data) {
+      console.log('dialogData', this.dialogData.data);
+
+      this.formGroup.get('name').setValue(this.dialogData.data.name);
+      this.formGroup.get('last_name_f').setValue(this.dialogData.data.last_name_f);
+      this.formGroup.get('last_name_m').setValue(this.dialogData.data.last_name_m);
+      this.formGroup.get('birth_date').setValue(this.dialogData.data.birth_date);
+      this.formGroup.get('age').setValue(this.dialogData.data.age);
+      this.formGroup.get('gender').setValue(this.dialogData.data.gender);
+      this.formGroup.get('phone_number').setValue(this.dialogData.data.phone_number);
+      this.formGroup.get('optional_phone_number').setValue(this.dialogData.data.optional_phone_number);
+      this.formGroup.get('email').setValue(this.dialogData.data.email);
+      this.formGroup.get('optional_email').setValue(this.dialogData.data.optional_email);
+      this.formGroup.get('marital_status').setValue(this.dialogData.data.marital_status);
+      this.formGroup.get('number_children').setValue(this.dialogData.data.number_children);
+      this.formGroup.get('country').setValue(this.dialogData.data.address.country_id);
+      if (this.dialogData.data.address.country_id) {
+        this.getStatesByCountry(this.dialogData.data.address.country_id);
+      }
+      console.log('this.dialogData.data.address.state_id', this.dialogData.data.address.state_id);
+
+      if (this.dialogData.data.address.state_id == null) {
+        console.log('es null');
+        this.formGroup.get('state').setValue(this.dialogData.data.address.state);
+        // this.formGroup.get('state').setValue('Ñañañaña');
+        this.is_mexico = false;
+      } else {
+        console.log('es null');
+        this.formGroup.get('state').setValue(this.dialogData.data.address.state_id);
+        this.is_mexico = true;
+      }
+      this.formGroup.get('city').setValue(this.dialogData.data.address.city);
+      this.formGroup.get('address').setValue(this.dialogData.data.address.address);
+    }
   }
 
   isEdit() {
@@ -147,7 +177,6 @@ export class PatientsDialogComponent implements OnInit {
     this.httpService.getAll(REQUEST.ZIP_CODES, this.formGroup.value).subscribe(
       (res: any) => {
         if (res.code === 200) {
-          console.log(res.data);
           this.openSnackBar('Acción exitosa.', 'success');
         } else {
           this.openSnackBar('Ocurrió un error.', 'error');
@@ -163,9 +192,7 @@ export class PatientsDialogComponent implements OnInit {
     this.httpService.getAll(REQUEST.COUNTRIES).subscribe(
       (res: any) => {
         if (res.code === 200) {
-          console.log(res.data);
           this.countries = res.data;
-          this.openSnackBar('Acción exitosa.', 'success');
         } else {
           this.openSnackBar('Ocurrió un error.', 'error');
         }
@@ -177,15 +204,19 @@ export class PatientsDialogComponent implements OnInit {
   }
 
   getStatesByCountry(event) {
-    this.is_mexico = event.value.name === 'Mexico' ? true : false;
-    this.formGroup.get('is_mexico').setValue(this.is_mexico);
-    this.httpService.getAll(REQUEST.STATES, event.value).subscribe(
+    console.log('getStatesByCountry', event);
+
+    this.isMexico();
+
+    // this.is_mexico = event.value.name === 'Mexico' ? true : false;
+    // this.formGroup.get('is_mexico').setValue(this.is_mexico);
+    this.httpService.getBy(REQUEST.STATES, event).subscribe(
       (res: any) => {
         if (res.code === 200) {
           if (res.data.length > 0) {
             this.states = res.data;
           } else {
-            this.formGroup.get('state').reset();
+            // this.formGroup.get('state').reset();
           }
         } else {
           this.openSnackBar('Ocurrió un error.', 'error');
@@ -195,6 +226,40 @@ export class PatientsDialogComponent implements OnInit {
         this.openSnackBar('Ocurrió un error.', 'error');
       }
     );
+  }
+
+  isMexico() {
+    console.log('inicio en isMexico', this.formGroup.get('country').value);
+
+    if (this.formGroup.get('country').value) {
+      const result = this.countries.filter(country =>
+        country.id == this.formGroup.get("country").value);
+
+      if (result.length > 0) {
+        if (result[0].name === 'Mexico') {
+          this.is_mexico = true;
+        } else {
+          this.is_mexico = false;
+        }
+      }
+
+      console.log('isMexico boolean', this.is_mexico);
+      console.log('isMexico result', result);
+
+      // if (this.dialogData.data) {
+      //   if (this.is_mexico) {
+      //     this.formGroup.get('state').setValue(this.dialogData.data.address.state_id);
+      //   } else {
+      //     this.formGroup.get('state').setValue(this.dialogData.data.address.state);
+      //   }
+      // }
+
+      this.formGroup.get('is_mexico').setValue(this.is_mexico);
+    }
+  }
+
+  resetStateForm() {
+    this.formGroup.get('state').reset();
   }
 
 }

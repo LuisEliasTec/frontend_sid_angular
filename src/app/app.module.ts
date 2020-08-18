@@ -13,6 +13,10 @@ import { SweetAlert2Module } from '@toverux/ngx-sweetalert2';
 import { SnackBarModule } from './shared/snackbar/snackbar.module';
 import { PublicComponentModule } from './public-components/public-components.module';
 import { APP_ROUTES } from './app.routes';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
+registerLocaleData(localeEs, 'es');
+import 'moment/locale/es'
 
 @NgModule({
   declarations: [
